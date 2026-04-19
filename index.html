@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tecnam PRO</title>
+
+<style>
+body { background:#0b0f1a; color:white; font-family:sans-serif; padding:15px;}
+.container { max-width:420px; margin:auto;}
+input, select, button {
+ width:100%; padding:10px; margin:5px 0;
+ border-radius:6px; border:none; font-size:16px;
+}
+.result { background:#111827; padding:15px; margin-top:10px; border-radius:10px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>✈️ Tecnam PRO</h2>
+
+<input id="icao" placeholder="ICAO (EPKK)">
+<button onclick="getMETAR()">METAR</button>
+
+<input id="pa" placeholder="PA ft" value="0">
+<input id="temp" placeholder="Temp °C" value="15">
+<input id="qnh" placeholder="QNH hPa" value="1013">
+
+<input id="windDir" placeholder="Wind dir °" value="0">
+<input id="windSpd" placeholder="Wind kt" value="0">
+<input id="rwy" placeholder="RWY °" value="0">
+
+<input id="rw" placeholder="Runway m" value="600">
+
+<button onclick="calc()">CALCULATE</button>
+
+<div class="result">
+<div id="out"></div>
+</div>
+
+</div>
+
+<script>
+
+const API_KEY = "jVbHbDZ2h0oEro_kSZaUCIyPLZGJJb6Oa9XC_kPXPZE";
+
+// ✅ FIXED METAR
+async function getMETAR() {
+
+ const icao = document.getElementById("icao").value.trim().toUpperCase();
+
+ try {
+   const res = await fetch(`https://avwx.rest/api/metar/${icao}?format=json`, {
+     headers: { "Authorization": API_KEY }
+   });
+
+   if (!res.ok) throw new Error(res.status);
+
+   const d = await res.json();
+
+   console.log(d);
+
+   // TEMP
+   if (d.temperature?.value != null)
+     temp.value = d.temperature.value;
+
+   // WIND SPEED
+   if (d.wind_speed?.value != null)
+     windSpd.value = d.wind_speed.value;
+
+   // ✅ WIND DIR FIX (VRB)
+   if (d.wind_direction?.value != null)
+     windDir.value = d.wind_direction.value;
+   else
+     windDir.value = 0; // VRB fallback
+
+   // ✅ QNH FIX (BEZ konwersji!)
+   if (d.altimeter?.value != null)
+     qnh.value = Math.round(d.altimeter.value);
+
+   alert("METAR OK");
+   calc();
+
+ } catch (e) {
+   console.error(e);
+   alert("Błąd połączenia lub API");
+ }
+}
+
+// CALC
+function calc(){
+
+ let PA=+pa.value;
+ let T=+temp.value;
+ let windD=+windDir.value;
+ let windS=+windSpd.value;
+ let RWY=+rwy.value;
+ let rwLen=+rw.value;
+
+ let angle=(windD-RWY)*Math.PI/180;
+ let head=windS*Math.cos(angle);
+
+ let g=220+0.032*PA+2.4*T+1.5e-6*PA*PA;
+
+ let warn="";
+ if(rwLen<g) warn="❌ RUNWAY TOO SHORT";
+
+ out.innerHTML=
+ `Ground Roll: ${Math.round(g)} m<br>
+ Headwind: ${head.toFixed(1)} kt<br>
+ QNH: ${qnh.value}<br>
+ ${warn}`;
+}
+
+</script>
+
+</body>
+</html>
