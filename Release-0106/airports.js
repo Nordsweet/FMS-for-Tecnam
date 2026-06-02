@@ -1,0 +1,117 @@
+window.TECNAM_DATA = {
+  generatedAt: "2026-04-25",
+  airports: [
+    {
+      icao: "EPKK",
+      arrivalOptions: [
+        { letter: "G", runway: "25" },
+        { letter: "H", runway: "07" }
+      ],
+      atisProfile: "PL",
+      atisFrequency: "126.130",
+      afterDepartureAppFrequency: "121.075",
+      name: "Krakow",
+      elevation: 791,
+      lat: 50.0777,
+      lon: 19.7848,
+      sampleMetar: "EPKK 241000Z 25012KT 9999 SCT030 18/09 Q1011",
+      runways: [
+        { id: "07", hdg: 73, surface: "paved", slope: 0.1, length_m: 2550, width_m: 60, tora: 2550, toda: 2550, asda: 2550, lda: 2550 },
+        { id: "25", hdg: 253, surface: "paved", slope: -0.1, length_m: 2550, width_m: 60, tora: 2550, toda: 2550, asda: 2550, lda: 2550 }
+      ]
+    },
+    {
+      icao: "EPPO",
+      arrivalOptions: [
+        { letter: "T", runway: "10" },
+        { letter: "D", runway: "28" },
+        { letter: "M", runway: "28" }
+      ],
+      atisProfile: "PL",
+      afterDepartureAppFrequency: "123.040",
+      name: "Poznan-Lawica",
+      elevation: 308,
+      lat: 52.4210,
+      lon: 16.8263,
+      sampleMetar: "EPPO 241000Z 27009KT 9999 SCT028 15/08 Q1015",
+      runways: [
+        { id: "10", hdg: 102, surface: "paved", slope: 0.0, length_m: 2504, width_m: 50, tora: 2504, toda: 2504, asda: 2504, lda: 2504 },
+        { id: "28", hdg: 282, surface: "paved", slope: 0.0, length_m: 2504, width_m: 50, tora: 2504, toda: 2504, asda: 2504, lda: 2504 }
+      ]
+    },
+    {
+      icao: "EPWA",
+      arrivalOptions: [
+        { letter: "E", runway: "" },
+        { letter: "W", runway: "" }
+      ],
+      atisProfile: "PL",
+      approachVariants: {
+        ILS: ["Y", "Z"]
+      },
+      afterDepartureAppFrequency: "123.430",
+      name: "Warszawa Chopin",
+      elevation: 362,
+      lat: 52.1657,
+      lon: 20.9671,
+      sampleMetar: "EPWA 241000Z 14011KT 9999 SCT025 19/07 Q1012",
+      runways: [
+        { id: "11", hdg: 110, surface: "paved", slope: 0.0, length_m: 2800, width_m: 50, tora: 2800, toda: 2800, asda: 2800, lda: 2800 },
+        { id: "29", hdg: 290, surface: "paved", slope: 0.0, length_m: 2800, width_m: 50, tora: 2800, toda: 2800, asda: 2800, lda: 2800 },
+        { id: "15", hdg: 148, surface: "paved", slope: 0.0, length_m: 3690, width_m: 60, tora: 3690, toda: 3690, asda: 3690, lda: 3690 },
+        { id: "33", hdg: 328, surface: "paved", slope: 0.0, length_m: 3690, width_m: 60, tora: 3690, toda: 3690, asda: 3690, lda: 3690 }
+      ]
+    },
+    {
+      icao: "EPKT",
+      arrivalOptions: [
+        { letter: "N", runway: "" },
+        { letter: "X", runway: "" }
+      ],
+      atisProfile: "PL",
+      afterDepartureAppFrequency: "121.075",
+      name: "Katowice",
+      elevation: 995,
+      lat: 50.4743,
+      lon: 19.0800,
+      sampleMetar: "EPKT 241000Z 26014KT 9999 BKN035 17/06 Q1009",
+      runways: [
+        { id: "08", hdg: 83, surface: "paved", slope: 0.0, length_m: 3200, width_m: 45, tora: 3200, toda: 3200, asda: 3200, lda: 3200 },
+        { id: "26", hdg: 263, surface: "paved", slope: 0.0, length_m: 3200, width_m: 45, tora: 3200, toda: 3200, asda: 3200, lda: 3200 }
+      ]
+    },
+    {
+      icao: "EPRZ",
+      arrivalOptions: [
+        { letter: "G", runway: "" },
+        { letter: "T", runway: "" }
+      ],
+      atisProfile: "PL",
+      afterDepartureAppFrequency: "133.030",
+      name: "Rzeszow-Jasionka",
+      elevation: 693,
+      lat: 50.1100,
+      lon: 22.0190,
+      sampleMetar: "EPRZ 241000Z 08007KT 9999 FEW025 16/05 Q1013",
+      runways: [
+        { id: "09", hdg: 90, surface: "paved", slope: 0.0, length_m: 3200, width_m: 45, tora: 3200, toda: 3200, asda: 3200, lda: 3200 },
+        { id: "27", hdg: 270, surface: "paved", slope: 0.0, length_m: 3200, width_m: 45, tora: 3200, toda: 3200, asda: 3200, lda: 3200 }
+      ]
+    },
+    {
+      icao: "EPXX",
+      atisProfile: "PL",
+      name: "Test Airport",
+      elevation: 1000,
+      lat: 51.7000,
+      lon: 19.5000,
+      sampleMetar: "EPXX 241000Z 36008KT 9999 SCT025 16/07 Q1013",
+      runways: [
+        { id: "36", hdg: 360, surface: "grass", slope: 0.0, length_m: 1000, width_m: 30, tora: 1000, toda: 1000, asda: 1000, lda: 1000 },
+        { id: "18", hdg: 180, surface: "grass", slope: 0.0, length_m: 1000, width_m: 30, tora: 1000, toda: 1000, asda: 1000, lda: 1000 },
+        { id: "27", hdg: 270, surface: "concrete", slope: 0.0, length_m: 1000, width_m: 30, tora: 1000, toda: 1000, asda: 1000, lda: 1000 },
+        { id: "09", hdg: 90, surface: "concrete", slope: 0.0, length_m: 1000, width_m: 30, tora: 1000, toda: 1000, asda: 1000, lda: 1000 }
+      ]
+    }
+  ]
+};
