@@ -12,7 +12,7 @@
   }
 
   function normalizeRegistration(value) {
-    return clean(value).toUpperCase().replace(/\s+/g, "");
+    return clean(value).toUpperCase().replace(/[^A-Z0-9]+/g, "");
   }
 
   function normalizePowerplant(value) {
@@ -24,6 +24,23 @@
       return "jet";
     }
     return "reciprocating";
+  }
+
+  function mergePerformanceData(basePerformance, overridePerformance) {
+    if (!overridePerformance) {
+      return basePerformance || null;
+    }
+    if (!basePerformance || typeof basePerformance !== "object" || typeof overridePerformance !== "object") {
+      return overridePerformance;
+    }
+    return {
+      ...basePerformance,
+      ...overridePerformance,
+      basic: {
+        ...(basePerformance.basic || {}),
+        ...(overridePerformance.basic || {})
+      }
+    };
   }
 
   function getProfileKey(type, registration) {
@@ -40,36 +57,68 @@
     const normalizedType = normalizeType(profile.type);
     const normalizedRegistration = normalizeRegistration(profile.registration);
     const key = getProfileKey(normalizedType, normalizedRegistration);
+    const baseProfile = normalizedRegistration ? profiles[getProfileKey(normalizedType, "")] || {} : {};
+    const existing = profiles[key] || {};
+    const incomingChecklists = Array.isArray(profile.checklists) ? profile.checklists : [];
+    const baseChecklists = Array.isArray(baseProfile.checklists) ? baseProfile.checklists : [];
+    const existingChecklists = Array.isArray(existing.checklists) && existing.checklists.length ? existing.checklists : baseChecklists;
+    const incomingPerformance = profile.performance || null;
+    const inheritedPerformance = existing.performance || baseProfile.performance || null;
+    const mergedPerformance = mergePerformanceData(inheritedPerformance, incomingPerformance);
+    const incomingPerformanceStatus = clean(profile.performanceStatus);
+    const existingPerformanceStatus = clean(existing.performanceStatus || baseProfile.performanceStatus);
+    const performanceStatus = incomingPerformance
+      ? (incomingPerformanceStatus && incomingPerformanceStatus !== "pending" ? incomingPerformanceStatus : existingPerformanceStatus && existingPerformanceStatus !== "pending" ? existingPerformanceStatus : "available")
+      : mergedPerformance
+        ? (existingPerformanceStatus && existingPerformanceStatus !== "pending" ? existingPerformanceStatus : "available")
+        : (incomingPerformanceStatus || existingPerformanceStatus || "pending");
     profiles[key] = {
-      checklists: Array.isArray(profile.checklists) ? profile.checklists : [],
-      dataFileBaseName: clean(profile.dataFileBaseName),
-      displayName: clean(profile.displayName || normalizedType),
-      displayType: clean(profile.type || normalizedType),
-      fuelCapacityLiters: Number.isFinite(Number(profile.fuelCapacityLiters)) ? Number(profile.fuelCapacityLiters) : null,
-      fuelTankCapacityLiters: Number.isFinite(Number(profile.fuelTankCapacityLiters)) ? Number(profile.fuelTankCapacityLiters) : null,
+      checklists: incomingChecklists.length ? incomingChecklists : existingChecklists,
+      dataFileBaseName: clean(profile.dataFileBaseName || existing.dataFileBaseName),
+      displayName: clean(profile.displayName || existing.displayName || normalizedType),
+      displayType: clean(profile.type || existing.displayType || normalizedType),
       icaoType: clean(profile.icaoType || normalizedType).toUpperCase(),
       isRegistrationSpecific: Boolean(normalizedRegistration),
-      limitations: profile.limitations || null,
-      metadata: profile.metadata || null,
-      order: Number.isFinite(Number(profile.order)) ? Number(profile.order) : 999,
-      performance: profile.performance || null,
-      performanceStatus: clean(profile.performanceStatus || (profile.performance ? "available" : "pending")),
-      powerplant: normalizePowerplant(profile.powerplant),
+      limitations: profile.limitations || existing.limitations || null,
+      metadata: profile.metadata || existing.metadata || null,
+      order: Number.isFinite(Number(profile.order)) ? Number(profile.order) : Number.isFinite(Number(existing.order)) ? Number(existing.order) : 999,
+      performance: mergedPerformance,
+      performanceStatus,
+      powerplant: normalizePowerplant(profile.powerplant || existing.powerplant),
       registration: normalizedRegistration,
-      source: clean(profile.source),
+      source: clean(profile.source || existing.source),
       type: normalizedType,
-      usableFuelCapacityLiters: Number.isFinite(Number(profile.usableFuelCapacityLiters)) ? Number(profile.usableFuelCapacityLiters) : null,
-      weightBalance: profile.weightBalance || null
+      weightBalance: profile.weightBalance || existing.weightBalance || null
     };
     return profiles[key];
   }
 
   function getProfile(type, registration) {
+    const normalizedRegistration = normalizeRegistration(registration);
     const exact = profiles[getProfileKey(type, registration)];
+    const base = profiles[getProfileKey(type, "")] || null;
+    if (exact && base && normalizedRegistration) {
+      const exactChecklists = Array.isArray(exact.checklists) ? exact.checklists : [];
+      const baseChecklists = Array.isArray(base.checklists) ? base.checklists : [];
+      const performance = mergePerformanceData(base.performance || null, exact.performance || null);
+      const exactPerformanceStatus = clean(exact.performanceStatus);
+      const basePerformanceStatus = clean(base.performanceStatus);
+      return {
+        ...base,
+        ...exact,
+        checklists: exactChecklists.length ? exactChecklists : baseChecklists,
+        performance,
+        performanceStatus: performance
+          ? (exact.performance
+            ? (exactPerformanceStatus && exactPerformanceStatus !== "pending" ? exactPerformanceStatus : basePerformanceStatus && basePerformanceStatus !== "pending" ? basePerformanceStatus : "available")
+            : (exactPerformanceStatus && exactPerformanceStatus !== "pending" ? exactPerformanceStatus : basePerformanceStatus && basePerformanceStatus !== "pending" ? basePerformanceStatus : "available"))
+          : (exactPerformanceStatus || basePerformanceStatus || "pending")
+      };
+    }
     if (exact) {
       return exact;
     }
-    return profiles[getProfileKey(type, "")] || null;
+    return base;
   }
 
   function getDefaultProfiles() {

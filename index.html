@@ -1515,30 +1515,7 @@ button:hover {
   stroke: #58d27e;
 }
 
-.taxi-chart-vfr-circuit-halo {
-  fill: none;
-  stroke: rgba(5, 5, 5, 0.72);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.taxi-chart-vfr-circuit-line {
-  fill: none;
-  stroke: #ff5f79;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.taxi-chart-vfr-circuit-point {
-  fill: #fffef7;
-  stroke: #ff5f79;
-}
-
 .taxi-chart-map.dark .taxi-chart-route-point {
-  fill: #050505;
-}
-
-.taxi-chart-map.dark .taxi-chart-vfr-circuit-point {
   fill: #050505;
 }
 
@@ -4840,8 +4817,7 @@ const DEFAULT_TAXI_OUT_ROUTE_DATA = {
 };
 const TAXI_OUT_ROUTE_DATA = mergeGroundDataSources(
   DEFAULT_TAXI_OUT_ROUTE_DATA,
-  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports,
-  getWaypointPackageVfrCircuitGroundData()
+  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports
 );
 const TAXI_CHART_PDF_FRAGMENT = "#toolbar=0&navpanes=0&scrollbar=0&page=1&view=Fit&zoom=page-fit";
 const TAXI_CHART_PDF_DB_NAME = "nordsweet-ground-editor-chart-pdfs";
@@ -5649,66 +5625,10 @@ function mergeGroundDataSources(...sources) {
       if (!airportIcao) {
         return;
       }
-      const existing = merged[airportIcao] || {};
-      const incoming = cleanSource[icao] || {};
-      const next = Object.assign({}, existing, incoming);
-      if (existing.chartOverlay || incoming.chartOverlay) {
-        next.chartOverlay = Object.assign({}, existing.chartOverlay || {}, incoming.chartOverlay || {});
-        if (existing.chartOverlay && incoming.chartOverlay && existing.chartOverlay.vfrCircuits && incoming.chartOverlay.vfrCircuits) {
-          next.chartOverlay.vfrCircuits = Object.assign({}, existing.chartOverlay.vfrCircuits || {}, incoming.chartOverlay.vfrCircuits || {});
-        }
-        if (existing.chartOverlay && incoming.chartOverlay && (Array.isArray(existing.chartOverlay.intersections) || Array.isArray(incoming.chartOverlay.intersections))) {
-          const intersections = new Map();
-          (Array.isArray(existing.chartOverlay.intersections) ? existing.chartOverlay.intersections : []).forEach((intersection) => {
-            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
-            if (id) {
-              intersections.set(id, intersection);
-            }
-          });
-          (Array.isArray(incoming.chartOverlay.intersections) ? incoming.chartOverlay.intersections : []).forEach((intersection) => {
-            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
-            if (id) {
-              intersections.set(id, intersection);
-            }
-          });
-          next.chartOverlay.intersections = Array.from(intersections.values());
-        }
-      }
-      merged[airportIcao] = next;
+      merged[airportIcao] = Object.assign({}, merged[airportIcao] || {}, cleanSource[icao]);
     });
     return merged;
   }, {});
-}
-
-function getWaypointPackageVfrCircuitGroundData() {
-  const result = {};
-  getPlannerWaypointDataPackages().forEach((dataPackage) => {
-    const packageCircuits = dataPackage && dataPackage.vfrCircuits && typeof dataPackage.vfrCircuits === "object" && !Array.isArray(dataPackage.vfrCircuits)
-      ? dataPackage.vfrCircuits
-      : {};
-    Object.keys(packageCircuits).forEach((airport) => {
-      const airportIcao = cleanAtisValue(airport).toUpperCase();
-      const data = packageCircuits[airport] || {};
-      if (!airportIcao || !data || typeof data !== "object") {
-        return;
-      }
-      const chartOverlay = {
-        chart: clonePlainData(data.chart || {}),
-        intersections: Array.isArray(data.intersections) ? clonePlainData(data.intersections) : [],
-        vfrCircuits: clonePlainData(data.circuits || data.vfrCircuits || {})
-      };
-      if (!result[airportIcao]) {
-        result[airportIcao] = {};
-      }
-      result[airportIcao].chartOverlay = Object.assign({}, result[airportIcao].chartOverlay || {}, chartOverlay);
-      result[airportIcao].chartOverlay.vfrCircuits = Object.assign(
-        {},
-        result[airportIcao].chartOverlay.vfrCircuits || {},
-        chartOverlay.vfrCircuits || {}
-      );
-    });
-  });
-  return result;
 }
 
 function normalizeAirport(rawAirport) {
@@ -6197,19 +6117,7 @@ function savePilotWeightPreference(value) {
 }
 
 function getWeightBalanceFieldConfig(key) {
-  const field = WEIGHT_BALANCE_FIELDS.find((item) => item.key === key) || null;
-  if (!field) {
-    return null;
-  }
-
-  if (key === "usableFuelLiters") {
-    const fuelTankCapacityLiters = getFuelTankCapacityLiters();
-    if (Number.isFinite(fuelTankCapacityLiters) && fuelTankCapacityLiters > 0) {
-      return { ...field, max: fuelTankCapacityLiters };
-    }
-  }
-
-  return field;
+  return WEIGHT_BALANCE_FIELDS.find((field) => field.key === key) || null;
 }
 
 function normalizeWeightBalanceFieldValue(key, value) {
@@ -6284,23 +6192,6 @@ function normalizeFuelPlanningFuelValue(value) {
   }
 
   return String(ceilFuelLiters(parsed));
-}
-
-function normalizeFuelPlanningFuelValueForRow(row, value) {
-  const normalized = normalizeFuelPlanningFuelValue(value);
-  if (normalized === "") {
-    return "";
-  }
-
-  if (row && row.key === "fuelOnBoard") {
-    const fuelTankCapacityLiters = getFuelTankCapacityLiters();
-    const parsed = toNumber(normalized, NaN);
-    if (Number.isFinite(fuelTankCapacityLiters) && fuelTankCapacityLiters > 0 && Number.isFinite(parsed)) {
-      return String(Math.min(parsed, Math.ceil(fuelTankCapacityLiters)));
-    }
-  }
-
-  return normalized;
 }
 
 function getFuelTankCapacityLiters() {
@@ -6399,7 +6290,7 @@ function getFuelPlanningFuelValue(row, options = {}) {
     return String(ceilFuelLiters(getFuelPlanningFinalReserveDetails().selectedLiters));
   }
   if (row && row.weightBalanceField) {
-    return normalizeFuelPlanningFuelValueForRow(row, getWeightBalanceRawValue(row.weightBalanceField));
+    return normalizeFuelPlanningFuelValue(getWeightBalanceRawValue(row.weightBalanceField));
   }
   if (!row) {
     return "";
@@ -7510,76 +7401,7 @@ function updateLinkedWeightBalanceFuelField(row, value) {
   saveWeightBalancePreferences();
 }
 
-function getActiveWeightBalanceProfile() {
-  const profile = getSelectedAircraftProfile();
-  return profile && profile.weightBalance && typeof profile.weightBalance === "object"
-    ? profile.weightBalance
-    : null;
-}
-
-function getActiveWeightBalanceArms() {
-  const profile = getActiveWeightBalanceProfile();
-  const profileArms = profile && profile.armsM && typeof profile.armsM === "object" ? profile.armsM : {};
-  return Object.keys(WEIGHT_BALANCE_ARMS_M).reduce((arms, key) => {
-    const profileArm = toNumber(profileArms[key], NaN);
-    arms[key] = Number.isFinite(profileArm) ? profileArm : WEIGHT_BALANCE_ARMS_M[key];
-    return arms;
-  }, {});
-}
-
-function getActiveWeightBalanceMtowKg() {
-  const profile = getActiveWeightBalanceProfile();
-  const profileMtow = toNumber(
-    profile && (
-      profile.mtowKg ||
-      profile.maxTakeoffWeightKg ||
-      profile.maximumTakeoffWeightKg
-    ),
-    NaN
-  );
-  return Number.isFinite(profileMtow) && profileMtow > 0 ? profileMtow : WEIGHT_BALANCE_MTOW_KG;
-}
-
-function getActiveWeightBalanceFuelDensityKgPerL() {
-  const profile = getActiveWeightBalanceProfile();
-  const profileDensity = toNumber(profile && profile.fuelDensityKgPerL, NaN);
-  return Number.isFinite(profileDensity) && profileDensity > 0
-    ? profileDensity
-    : WEIGHT_BALANCE_FUEL_DENSITY_KG_PER_L;
-}
-
-function getActiveWeightBalanceEnvelope() {
-  const profile = getActiveWeightBalanceProfile();
-  const profileEnvelope = profile && profile.envelope && typeof profile.envelope === "object"
-    ? profile.envelope
-    : null;
-  const points = profileEnvelope && Array.isArray(profileEnvelope.points)
-    ? profileEnvelope.points.filter((point) => Number.isFinite(toNumber(point.weightKg, NaN)) && Number.isFinite(toNumber(point.momentKgm, NaN)))
-    : [];
-  if (points.length >= 3) {
-    return {
-      maxMomentKgm: toNumber(profileEnvelope.maxMomentKgm, Math.max(...points.map((point) => point.momentKgm))),
-      maxWeightKg: toNumber(profileEnvelope.maxWeightKg, Math.max(...points.map((point) => point.weightKg))),
-      minMomentKgm: toNumber(profileEnvelope.minMomentKgm, Math.min(...points.map((point) => point.momentKgm))),
-      minWeightKg: toNumber(profileEnvelope.minWeightKg, Math.min(...points.map((point) => point.weightKg))),
-      points: points.map((point) => ({
-        momentKgm: toNumber(point.momentKgm, 0),
-        weightKg: toNumber(point.weightKg, 0)
-      }))
-    };
-  }
-
-  return WEIGHT_BALANCE_ENVELOPE;
-}
-
 function getWeightBalanceDefaultValue(key) {
-  const profile = getActiveWeightBalanceProfile();
-  const profileDefaults = profile && profile.defaults && typeof profile.defaults === "object" ? profile.defaults : {};
-  const profileValue = profileDefaults[key];
-  if (cleanAtisValue(profileValue) !== "") {
-    return cleanAtisValue(profileValue);
-  }
-
   const defaults = WEIGHT_BALANCE_DEFAULTS_BY_AIRCRAFT[state.selectedAircraftType] || {};
   return cleanAtisValue(defaults[key] || "");
 }
@@ -7591,7 +7413,7 @@ function getWeightBalanceRawValue(key, options = {}) {
   }
   const storedValue = state.weightBalance && cleanAtisValue(state.weightBalance[key]);
   if (storedValue !== "") {
-    return normalizeWeightBalanceFieldValue(key, storedValue);
+    return storedValue;
   }
   return getWeightBalanceDefaultValue(key);
 }
@@ -7611,7 +7433,7 @@ function getWeightBalanceMoment(weightKg, armM) {
 }
 
 function getFuelWeightFromLiters(liters) {
-  return Math.max(0, toNumber(liters, 0)) * getActiveWeightBalanceFuelDensityKgPerL();
+  return Math.max(0, toNumber(liters, 0)) * WEIGHT_BALANCE_FUEL_DENSITY_KG_PER_L;
 }
 
 function getWeightBalanceRows(options = {}) {
@@ -7619,8 +7441,6 @@ function getWeightBalanceRows(options = {}) {
   const fieldOptions = {
     suppressFuelSuggestions: Boolean(settings.suppressFuelSuggestions)
   };
-  const arms = getActiveWeightBalanceArms();
-  const mtowWeightKg = getActiveWeightBalanceMtowKg();
   const emptyWeightKg = getWeightBalanceOptionalNumber("emptyWeightKg", fieldOptions);
   const emptyArmM = getWeightBalanceOptionalNumber("emptyArmM", fieldOptions);
   const usableFuelLiters = getWeightBalanceFieldNumber("usableFuelLiters", fieldOptions);
@@ -7638,17 +7458,17 @@ function getWeightBalanceRows(options = {}) {
   const baggageWeightKg = getWeightBalanceFieldNumber("baggageWeightKg", fieldOptions);
   const rows = [
     { armM: emptyArmM, key: "empty", label: "Empty weight", momentKgm: getWeightBalanceMoment(emptyWeightKg, emptyArmM), weightKg: emptyWeightKg },
-    { armM: arms.pilot, key: "pilot", label: "Pilot", momentKgm: getWeightBalanceMoment(state.pilotWeightKg, arms.pilot), weightKg: state.pilotWeightKg },
-    { armM: arms.coPilot, key: "coPilot", label: "Co-Pilot", momentKgm: getWeightBalanceMoment(coPilotWeightKg, arms.coPilot), weightKg: coPilotWeightKg },
-    { armM: arms.firstPassenger, key: "firstPassenger", label: "1st Passenger", momentKgm: getWeightBalanceMoment(firstPassengerWeightKg, arms.firstPassenger), weightKg: firstPassengerWeightKg },
-    { armM: arms.secondPassenger, key: "secondPassenger", label: "2nd Passenger", momentKgm: getWeightBalanceMoment(secondPassengerWeightKg, arms.secondPassenger), weightKg: secondPassengerWeightKg },
-    { armM: arms.baggage, key: "baggage", label: "Baggage", momentKgm: getWeightBalanceMoment(baggageWeightKg, arms.baggage), weightKg: baggageWeightKg },
-    { armM: arms.fuel, key: "usableFuel", label: "Usable fuel", momentKgm: getWeightBalanceMoment(usableFuelWeightKg, arms.fuel), weightKg: usableFuelWeightKg }
+    { armM: WEIGHT_BALANCE_ARMS_M.pilot, key: "pilot", label: "Pilot", momentKgm: getWeightBalanceMoment(state.pilotWeightKg, WEIGHT_BALANCE_ARMS_M.pilot), weightKg: state.pilotWeightKg },
+    { armM: WEIGHT_BALANCE_ARMS_M.coPilot, key: "coPilot", label: "Co-Pilot", momentKgm: getWeightBalanceMoment(coPilotWeightKg, WEIGHT_BALANCE_ARMS_M.coPilot), weightKg: coPilotWeightKg },
+    { armM: WEIGHT_BALANCE_ARMS_M.firstPassenger, key: "firstPassenger", label: "1st Passenger", momentKgm: getWeightBalanceMoment(firstPassengerWeightKg, WEIGHT_BALANCE_ARMS_M.firstPassenger), weightKg: firstPassengerWeightKg },
+    { armM: WEIGHT_BALANCE_ARMS_M.secondPassenger, key: "secondPassenger", label: "2nd Passenger", momentKgm: getWeightBalanceMoment(secondPassengerWeightKg, WEIGHT_BALANCE_ARMS_M.secondPassenger), weightKg: secondPassengerWeightKg },
+    { armM: WEIGHT_BALANCE_ARMS_M.baggage, key: "baggage", label: "Baggage", momentKgm: getWeightBalanceMoment(baggageWeightKg, WEIGHT_BALANCE_ARMS_M.baggage), weightKg: baggageWeightKg },
+    { armM: WEIGHT_BALANCE_ARMS_M.fuel, key: "usableFuel", label: "Usable fuel", momentKgm: getWeightBalanceMoment(usableFuelWeightKg, WEIGHT_BALANCE_ARMS_M.fuel), weightKg: usableFuelWeightKg }
   ];
   const loadedWeightKg = rows.reduce((sum, row) => sum + (Number.isFinite(row.weightKg) ? row.weightKg : 0), 0);
   const loadedMomentKgm = rows.reduce((sum, row) => sum + (Number.isFinite(row.momentKgm) ? row.momentKgm : 0), 0);
-  const fuelRequiredMomentKgm = getWeightBalanceMoment(fuelRequiredWeightKg, arms.fuel);
-  const alternateFuelMomentKgm = getWeightBalanceMoment(alternateFuelWeightKg, arms.fuel);
+  const fuelRequiredMomentKgm = getWeightBalanceMoment(fuelRequiredWeightKg, WEIGHT_BALANCE_ARMS_M.fuel);
+  const alternateFuelMomentKgm = getWeightBalanceMoment(alternateFuelWeightKg, WEIGHT_BALANCE_ARMS_M.fuel);
   const landingMomentKgm = loadedMomentKgm - fuelRequiredMomentKgm;
   const landingWeightKg = loadedWeightKg - fuelRequiredWeightKg;
 
@@ -7658,14 +7478,13 @@ function getWeightBalanceRows(options = {}) {
     alternateFuelWeightKg,
     alternateLandingMomentKgm: landingMomentKgm - alternateFuelMomentKgm,
     alternateLandingWeightKg: landingWeightKg - alternateFuelWeightKg,
-    arms,
     fuelRequiredMomentKgm,
     fuelRequiredLiters,
     fuelRequiredWeightKg,
     loadedMomentKgm,
     loadedWeightKg,
-    mlwWeightKg: Math.max(0, mtowWeightKg - fuelRequiredWeightKg),
-    mtowWeightKg,
+    mlwWeightKg: Math.max(0, WEIGHT_BALANCE_MTOW_KG - fuelRequiredWeightKg),
+    mtowWeightKg: WEIGHT_BALANCE_MTOW_KG,
     rows,
     usableFuelLiters,
     usableFuelWeightKg,
@@ -7741,58 +7560,41 @@ function pointInPolygon(point, polygon) {
   return isInside;
 }
 
-function getWeightBalanceGridStep(range, targetLines = 7) {
-  const rawStep = Math.max(1, Math.abs(range) / Math.max(1, targetLines));
-  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
-  const normalized = rawStep / magnitude;
-  const nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
-  return nice * magnitude;
-}
-
-function getWeightBalanceGridValues(minValue, maxValue, targetLines = 7) {
-  const min = toNumber(minValue, 0);
-  const max = toNumber(maxValue, min + 1);
-  const step = getWeightBalanceGridStep(max - min, targetLines);
-  const start = Math.ceil(min / step) * step;
-  const values = [];
-  for (let value = start; value <= max + step * 0.01; value += step) {
-    values.push(Math.round(value * 1000) / 1000);
-  }
-  return values;
-}
-
-function renderWeightBalanceChart(weightKg, momentKgm, mlwWeightKg = getActiveWeightBalanceMtowKg(), landingWeightKg = NaN, landingMomentKgm = NaN, alternateLandingWeightKg = NaN, alternateLandingMomentKgm = NaN) {
+function renderWeightBalanceChart(weightKg, momentKgm, mlwWeightKg = WEIGHT_BALANCE_MTOW_KG, landingWeightKg = NaN, landingMomentKgm = NaN, alternateLandingWeightKg = NaN, alternateLandingMomentKgm = NaN) {
   const width = 720;
   const height = 420;
   const margin = { bottom: 45, left: 58, right: 24, top: 26 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
-  const envelope = getActiveWeightBalanceEnvelope();
-  const mtowKg = getActiveWeightBalanceMtowKg();
+  const envelope = WEIGHT_BALANCE_ENVELOPE;
   const mapX = (moment) => margin.left + ((moment - envelope.minMomentKgm) / (envelope.maxMomentKgm - envelope.minMomentKgm)) * plotWidth;
   const mapY = (weight) => margin.top + plotHeight - ((weight - envelope.minWeightKg) / (envelope.maxWeightKg - envelope.minWeightKg)) * plotHeight;
   const gridLines = [];
 
-  getWeightBalanceGridValues(envelope.minMomentKgm, envelope.maxMomentKgm, 8).forEach((moment) => {
+  for (let moment = 175; moment <= 550; moment += 25) {
     const x = mapX(moment);
     gridLines.push('<line x1="' + x + '" y1="' + margin.top + '" x2="' + x + '" y2="' + (margin.top + plotHeight) + '" stroke="#e1e8f2" stroke-width="1"/>');
-    gridLines.push('<text x="' + x + '" y="' + (height - 16) + '" text-anchor="middle" font-size="10" fill="#526273">' + escapeHtml(formatWeightBalanceNumber(moment, 0)) + "</text>");
-  });
+    if (moment % 50 === 0) {
+      gridLines.push('<text x="' + x + '" y="' + (height - 16) + '" text-anchor="middle" font-size="10" fill="#526273">' + moment + "</text>");
+    }
+  }
 
-  getWeightBalanceGridValues(envelope.minWeightKg, envelope.maxWeightKg, 7).forEach((weight) => {
+  for (let weight = 800; weight <= 1300; weight += 50) {
     const y = mapY(weight);
     gridLines.push('<line x1="' + margin.left + '" y1="' + y + '" x2="' + (margin.left + plotWidth) + '" y2="' + y + '" stroke="#e7edf5" stroke-width="1"/>');
-    gridLines.push('<text x="' + (margin.left - 10) + '" y="' + (y + 3) + '" text-anchor="end" font-size="10" fill="#526273">' + escapeHtml(formatWeightBalanceNumber(weight, 0)) + "</text>");
-  });
+    if (weight % 100 === 0) {
+      gridLines.push('<text x="' + (margin.left - 10) + '" y="' + (y + 3) + '" text-anchor="end" font-size="10" fill="#526273">' + weight + "</text>");
+    }
+  }
 
   const envelopePoints = envelope.points
     .map((point) => mapX(point.momentKgm) + "," + mapY(point.weightKg))
     .join(" ");
-  const mtowY = mapY(mtowKg);
+  const mtowY = mapY(WEIGHT_BALANCE_MTOW_KG);
   const mtowLineSvg = [
     '<g aria-label="MTOW limit">',
     '<line x1="' + margin.left + '" y1="' + mtowY + '" x2="' + (margin.left + plotWidth) + '" y2="' + mtowY + '" stroke="#d92d45" stroke-width="1.8" stroke-dasharray="8 6"/>',
-    '<text x="' + (margin.left + plotWidth - 8) + '" y="' + (mtowY - 7) + '" text-anchor="end" font-size="11" font-weight="900" fill="#d92d45">MTOW ' + escapeHtml(formatWeightBalanceNumber(mtowKg, 0)) + ' kg</text>',
+    '<text x="' + (margin.left + plotWidth - 8) + '" y="' + (mtowY - 7) + '" text-anchor="end" font-size="11" font-weight="900" fill="#d92d45">MTOW ' + escapeHtml(formatWeightBalanceNumber(WEIGHT_BALANCE_MTOW_KG, 0)) + ' kg</text>',
     "</g>"
   ].join("");
   const hasPoint = Number.isFinite(weightKg) && Number.isFinite(momentKgm) && weightKg > 0;
@@ -7850,12 +7652,10 @@ function renderWeightBalanceCard(label, value) {
 function renderWeightBalanceContentHtml() {
   const activePhase = PERFORMANCE_PHASES.find((phase) => phase.key === getActivePerformancePhaseKey());
   const calculation = getWeightBalanceRows();
-  const envelope = getActiveWeightBalanceEnvelope();
   const insideEnvelope = pointInPolygon(
     { momentKgm: calculation.loadedMomentKgm, weightKg: calculation.loadedWeightKg },
-    envelope.points
+    WEIGHT_BALANCE_ENVELOPE.points
   );
-  const arms = calculation.arms || getActiveWeightBalanceArms();
   const hasEmptyData = Number.isFinite(getWeightBalanceOptionalNumber("emptyWeightKg")) && Number.isFinite(getWeightBalanceOptionalNumber("emptyArmM"));
   const statusTone = !hasEmptyData ? "warn" : insideEnvelope ? "ok" : "error";
   const statusText = hasEmptyData
@@ -7874,51 +7674,51 @@ function renderWeightBalanceContentHtml() {
     renderWeightBalanceTableRow(
       { label: "Pilot" },
       '<input type="number" aria-label="Pilot weight kg" data-wb-pilot-weight min="0" max="300" step="1" value="' + escapeHtml(state.pilotWeightKg) + '">',
-      formatWeightBalanceNumber(arms.pilot, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.pilot, 3),
       calculation.rows[1].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Co-Pilot" },
       renderWeightBalanceInput("coPilotWeightKg", "Co-pilot weight kg"),
-      formatWeightBalanceNumber(arms.coPilot, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.coPilot, 3),
       calculation.rows[2].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "1st Passenger" },
       renderWeightBalanceInput("firstPassengerWeightKg", "First passenger weight kg"),
-      formatWeightBalanceNumber(arms.firstPassenger, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.firstPassenger, 3),
       calculation.rows[3].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "2nd Passenger" },
       renderWeightBalanceInput("secondPassengerWeightKg", "Second passenger weight kg"),
-      formatWeightBalanceNumber(arms.secondPassenger, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.secondPassenger, 3),
       calculation.rows[4].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Baggage" },
       renderWeightBalanceInput("baggageWeightKg", "Baggage weight kg"),
-      formatWeightBalanceNumber(arms.baggage, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.baggage, 3),
       calculation.rows[5].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Usable fuel [L]" },
       renderWeightBalanceFuelInput("usableFuelLiters", "Usable fuel liters", calculation.usableFuelLiters, calculation.usableFuelWeightKg),
-      formatWeightBalanceNumber(arms.fuel, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
       calculation.rows[6].momentKgm
     ),
     '<tr class="wb-total-row"><td>Current condition W = Sum W</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.loadedWeightKg, 1)) + '</td><td>M = Sum M</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.loadedMomentKgm, 1)) + "</td></tr>",
     renderWeightBalanceTableRow(
       { label: "Trip fuel [L]" },
       renderWeightBalanceFuelInput("fuelRequiredLiters", "Trip fuel liters", calculation.fuelRequiredLiters, calculation.fuelRequiredWeightKg),
-      formatWeightBalanceNumber(arms.fuel, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
       calculation.fuelRequiredMomentKgm
     ),
     '<tr class="wb-total-row"><td>Landing condition W = W - fuel</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.landingWeightKg, 1)) + '</td><td>M = M - fuel moment</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.landingMomentKgm, 1)) + "</td></tr>",
     renderWeightBalanceTableRow(
       { label: "Alternate fuel [L]" },
       '<span>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateFuelLiters, 0)) + " L = " + escapeHtml(formatWeightBalanceNumber(calculation.alternateFuelWeightKg, 1)) + " kg</span>",
-      formatWeightBalanceNumber(arms.fuel, 3),
+      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
       calculation.alternateFuelMomentKgm
     ),
     '<tr class="wb-total-row"><td>ALW = LW - alternate fuel</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateLandingWeightKg, 1)) + '</td><td>M = LW moment - alternate fuel moment</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateLandingMomentKgm, 1)) + "</td></tr>"
@@ -15900,10 +15700,9 @@ function renderAircraftFuelLitersCell(row, minimumFuelLiters) {
 
   const entry = getFuelPlanningEntry(row.key);
   const defaultSuggestion = entry.fuelLiters === "" ? getFuelPlanningSuggestion(row.key, "fuelLiters") : null;
-  const maxFuelLiters = row.key === "fuelOnBoard" ? getFuelTankCapacityLiters() : 9999;
   return [
     "<td>",
-    '<input type="number" min="0" max="' + escapeHtml(maxFuelLiters) + '" step="1" aria-label="' + escapeHtml(row.label + " fuel liters") + '" data-fuel-row="' + escapeHtml(row.key) + '" data-fuel-field="fuelLiters" value="' + escapeHtml(getFuelPlanningFuelValue(row)) + '" title="' + escapeHtml(defaultSuggestion ? defaultSuggestion.title : "") + '">',
+    '<input type="number" min="0" max="9999" step="1" aria-label="' + escapeHtml(row.label + " fuel liters") + '" data-fuel-row="' + escapeHtml(row.key) + '" data-fuel-field="fuelLiters" value="' + escapeHtml(getFuelPlanningFuelValue(row)) + '" title="' + escapeHtml(defaultSuggestion ? defaultSuggestion.title : "") + '">',
     "</td>"
   ].join("");
 }
@@ -16023,7 +15822,7 @@ function handleFuelPlanningFieldChange(input) {
   const entry = getFuelPlanningEntry(row.key);
   const normalizedValue = fieldKey === "time"
     ? normalizeFuelPlanningTime(input.value)
-    : normalizeFuelPlanningFuelValueForRow(row, input.value);
+    : normalizeFuelPlanningFuelValue(input.value);
   input.value = normalizedValue;
 
   if (fieldKey === "time") {
@@ -21707,46 +21506,6 @@ function getTaxiChartPointString(points) {
     .join(" ");
 }
 
-function getTaxiChartVfrCircuitPoint(routeData, point) {
-  const intersectionId = normalizeGroundThingId(point && (point.intersectionId || point.sourceIntersectionId || point.id));
-  const intersection = intersectionId && routeData && routeData.chartOverlay && Array.isArray(routeData.chartOverlay.intersections)
-    ? routeData.chartOverlay.intersections.find((candidate) => normalizeGroundThingId(candidate && candidate.id) === intersectionId)
-    : null;
-  return {
-    id: intersectionId || "",
-    x: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.width, Number(intersection ? intersection.x : point && point.x))),
-    y: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.height, Number(intersection ? intersection.y : point && point.y)))
-  };
-}
-
-function renderTaxiChartVfrCircuits(routeData, lineWidth) {
-  const circuits = routeData && routeData.chartOverlay && routeData.chartOverlay.vfrCircuits && typeof routeData.chartOverlay.vfrCircuits === "object"
-    ? routeData.chartOverlay.vfrCircuits
-    : {};
-  return Object.keys(circuits)
-    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }))
-    .map((circuitId) => {
-      const circuit = circuits[circuitId] || {};
-      const points = (Array.isArray(circuit.points) ? circuit.points : [])
-        .map((point) => getTaxiChartVfrCircuitPoint(routeData, point))
-        .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
-      const pointString = getTaxiChartPointString(points);
-      if (!points.length) {
-        return "";
-      }
-      const width = Math.max(3, toNumber(lineWidth, 7) * 0.86);
-      const haloWidth = width * 2.45;
-      const radius = Math.max(4.2, width * 0.75);
-      const pointStrokeWidth = Math.max(1.8, width * 0.3);
-      return [
-        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-halo" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>' : "",
-        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-line" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(width) + '" data-base-stroke-width="' + formatChartNumber(width) + '"><title>' + escapeHtml((circuit.label || circuit.id || circuitId) + " VFR circuit") + '</title></polyline>' : "",
-        points.map((point, index) => '<circle class="taxi-chart-vfr-circuit-point" cx="' + formatChartNumber(point.x) + '" cy="' + formatChartNumber(point.y) + '" r="' + formatChartNumber(radius) + '" stroke-width="' + formatChartNumber(pointStrokeWidth) + '" data-base-r="' + formatChartNumber(radius) + '" data-base-stroke-width="' + formatChartNumber(pointStrokeWidth) + '"><title>' + escapeHtml((circuit.id || circuitId) + " point " + (index + 1)) + '</title></circle>').join("")
-      ].join("");
-    })
-    .join("");
-}
-
 function getTaxiChartRoutePointMarkup(points, lineWidth, options = {}) {
   const radius = Math.max(5, toNumber(lineWidth, 7) * 0.9);
   const pointStrokeWidth = Math.max(2.2, lineWidth * 0.32);
@@ -22457,7 +22216,6 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
   const routePointString = getTaxiChartPointString(routePoints);
   const routeWidth = Math.max(3, Math.min(toNumber(state.taxiChartRouteWidth, 7), 16));
   const haloWidth = routeWidth * 2.6;
-  const vfrCircuitMarkup = renderTaxiChartVfrCircuits(getTaxiOutRouteData(airport), routeWidth);
   const savedTransform = state.taxiChartTransform && typeof state.taxiChartTransform === "object"
     ? state.taxiChartTransform
     : {};
@@ -22515,7 +22273,6 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
       : '<div class="taxi-chart-empty">' + (isLoadingStoredPdf ? "Restoring stored airport chart..." : "Load airport chart PDF to use it as taxi background.") + "</div>",
     '<svg class="taxi-chart-overlay" data-taxi-chart-overlay viewBox="0 0 ' + TAXI_CHART_VIEWBOX.width + " " + TAXI_CHART_VIEWBOX.height + '" preserveAspectRatio="none" aria-label="Taxi route overlay">',
     '<rect x="0" y="0" width="' + TAXI_CHART_VIEWBOX.width + '" height="' + TAXI_CHART_VIEWBOX.height + '" fill="transparent" pointer-events="all"/>',
-    vfrCircuitMarkup,
     '<polyline class="taxi-chart-route-halo" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>',
     '<polyline class="taxi-chart-route-line" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(routeWidth) + '" data-base-stroke-width="' + formatChartNumber(routeWidth) + '"></polyline>',
     getTaxiChartRoutePointMarkup(routePoints, routeWidth, { hideFirstPoint: isTaxiIn }),

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nordsweet-performance-calculator-v311";
+const CACHE_NAME = "nordsweet-performance-calculator-v313";
 const ASSETS = [
   "./",
   "./index.html",
@@ -19,9 +19,6 @@ const ASSETS = [
   "./charts/AD_2_EPPO_2-1_upscaled_400.pdf",
   "./charts/AD%202%20EPZG%202_upscaled_400.pdf",
   "./charts/AD%204%20EPNT%202_upscaled_400.pdf",
-  "./charts/AD_4_EPBC_2_upscaled_400.pdf",
-  "./charts/AD_4_EPLS_2_upscaled_400.pdf",
-  "./charts/AD_4_EPPI_2_upscaled_400.pdf",
   "./atis-feed.js",
   "./atis-db-config.js",
   "./checklist-data.js",

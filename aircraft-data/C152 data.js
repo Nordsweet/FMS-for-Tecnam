@@ -1,6 +1,6 @@
 window.NORDSWEET_AIRCRAFT_DATA.register({
   checklists: [],
-  dataFileBaseName: "C152 data",
+  dataFileBaseName: "C152-data",
   displayName: "Cessna 152",
   icaoType: "C152",
   order: 5,

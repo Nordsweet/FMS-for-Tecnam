@@ -790,7 +790,7 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
       ]
     }
   ],
-  dataFileBaseName: "P2006T data",
+  dataFileBaseName: "P06T-data",
   displayName: "Tecnam P2006T",
   icaoType: "P06T",
   order: 1,

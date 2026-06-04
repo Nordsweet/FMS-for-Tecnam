@@ -677,7 +677,7 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
       ]
     }
   ],
-  dataFileBaseName: "P2008JC data",
+  dataFileBaseName: "P208-data",
   displayName: "Tecnam P2008JC",
   icaoType: "P208",
   order: 2,
