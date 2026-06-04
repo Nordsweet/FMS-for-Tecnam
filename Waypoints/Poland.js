@@ -3,13 +3,17 @@ window.NORDSWEET_PRIVATE_WAYPOINTS.POLAND = {
   "metadata": {
     "name": "Nordsweet Poland Private Waypoints",
     "country": "Poland",
-    "generatedAt": "2026-05-31T09:58:10.095Z",
-    "waypointCount": 10,
+    "generatedAt": "2026-06-04T09:42:44.710Z",
+    "waypointCount": 14,
     "importedWaypointCount": 753,
-    "availableWaypointCount": 763,
+    "availableWaypointCount": 767,
     "procedureCount": 1,
+    "vfrCircuitCount": 0,
+    "importedProcedureCount": 106,
+    "availableProcedureCount": 107,
     "imports": [
-      "navdata.js"
+      "navdata.js",
+      "procedure-data.js"
     ],
     "notForNavigation": true,
     "note": "Private local planning data. Verify current AIP, AIRAC, NOTAM and ATC clearance before flight."
@@ -47,6 +51,70 @@ window.NORDSWEET_PRIVATE_WAYPOINTS.POLAND = {
       "note": "",
       "routes": [],
       "origin": "PRIVATE",
+      "dmeArcPoint": null
+    },
+    "EPBCG": {
+      "id": "EPBCG",
+      "name": "EPBCG",
+      "rules": "VFR",
+      "ruleSet": [
+        "VFR"
+      ],
+      "lat": 51.990833,
+      "lon": 21.234722,
+      "coord": "515927N 0211405E",
+      "source": "AIP",
+      "note": "",
+      "routes": [],
+      "origin": "NAVDATA",
+      "dmeArcPoint": null
+    },
+    "EPBCK": {
+      "id": "EPBCK",
+      "name": "EPBCK",
+      "rules": "VFR",
+      "ruleSet": [
+        "VFR"
+      ],
+      "lat": 52.091389,
+      "lon": 21.2375,
+      "coord": "520529N 0211415E",
+      "source": "AIP",
+      "note": "",
+      "routes": [],
+      "origin": "NAVDATA",
+      "dmeArcPoint": null
+    },
+    "EPBCN": {
+      "id": "EPBCN",
+      "name": "EPBCN",
+      "rules": "VFR",
+      "ruleSet": [
+        "VFR"
+      ],
+      "lat": 52.2175,
+      "lon": 21.097222,
+      "coord": "521303N 0210550E",
+      "source": "AIP",
+      "note": "",
+      "routes": [],
+      "origin": "NAVDATA",
+      "dmeArcPoint": null
+    },
+    "EPBCZ": {
+      "id": "EPBCZ",
+      "name": "EPBCZ",
+      "rules": "VFR",
+      "ruleSet": [
+        "VFR"
+      ],
+      "lat": 52.290278,
+      "lon": 21.010833,
+      "coord": "521725N 0210039E",
+      "source": "AIP",
+      "note": "",
+      "routes": [],
+      "origin": "NAVDATA",
       "dmeArcPoint": null
     },
     "OKEKI": {
@@ -298,6 +366,74 @@ window.NORDSWEET_PRIVATE_WAYPOINTS.POLAND = {
       ],
       "approaches": [],
       "dmeArcs": []
+    }
+  },
+  "vfrCircuits": {
+    "EPKK": {
+      "airport": "EPKK",
+      "chart": {
+        "title": "AD 4 EPNT 3.pdf",
+        "src": "./charts/AD%204%20EPNT%203.pdf",
+        "renderScale": 8,
+        "maxScale": 10,
+        "aspectRatio": 1.7777777777777777,
+        "color": true
+      },
+      "intersections": [
+        {
+          "id": "INT-417-511",
+          "label": "INT-417-511",
+          "x": 416.646,
+          "y": 511.033
+        },
+        {
+          "id": "INT-450-401",
+          "label": "INT-450-401",
+          "x": 450.456,
+          "y": 400.503
+        },
+        {
+          "id": "INT-457-495",
+          "label": "INT-457-495",
+          "x": 456.533,
+          "y": 495.244
+        },
+        {
+          "id": "INT-472-454",
+          "label": "INT-472-454",
+          "x": 492.688,
+          "y": 475.038
+        },
+        {
+          "id": "INT-473-436",
+          "label": "INT-473-436",
+          "x": 472.54,
+          "y": 435.7
+        }
+      ],
+      "constructionLines": [],
+      "circuits": {}
+    },
+    "EPNT": {
+      "airport": "EPNT",
+      "chart": {
+        "title": "AD 4 EPNT 3.pdf",
+        "src": "./charts/AD%204%20EPNT%203.pdf",
+        "renderScale": 8,
+        "maxScale": 10,
+        "aspectRatio": 1.7777777777777777,
+        "color": true
+      },
+      "intersections": [
+        {
+          "id": "INT-502-691",
+          "label": "INT-502-691",
+          "x": 603.423,
+          "y": 561.536
+        }
+      ],
+      "constructionLines": [],
+      "circuits": {}
     }
   }
 };
