@@ -4272,9 +4272,8 @@ button:hover {
 <script src="./Waypoints/index.js"></script>
 <script src="./ground-data.js?v=ground-chart-overlay-v173"></script>
 <script src="./aircraft-data.js"></script>
-<script src="./p2006t-performance.js"></script>
-<script src="./husk-performance.js"></script>
-<script src="./checklist-data.js"></script>
+<script src="./aircraft-data/p2006t-performance.js"></script>
+<script src="./aircraft-data/husk-performance.js"></script>
 <script src="./aircraft-data/P2006T%20data.js"></script>
 <script src="./aircraft-data/P2008JC%20data.js"></script>
 <script src="./aircraft-data/P2002JR%20data.js"></script>
@@ -19968,7 +19967,6 @@ function getChecklistEditorDataStore() {
 function getChecklistDataStore() {
   const mergedStore = Object.assign(
     {},
-    hasChecklistContent(window.NORDSWEET_CHECKLIST_DATA) ? window.NORDSWEET_CHECKLIST_DATA : {},
     getAircraftProfileChecklistDataStore(),
     getChecklistEditorDataStore() || {}
   );
