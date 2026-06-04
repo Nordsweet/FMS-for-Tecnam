@@ -1,4 +1,4 @@
-const CACHE_NAME = "nordsweet-performance-calculator-v318";
+const CACHE_NAME = "nordsweet-performance-calculator-v319";
 const ASSETS = [
   "./",
   "./index.html",
@@ -32,7 +32,9 @@ const ASSETS = [
 ];
 
 const NETWORK_FIRST_FILENAMES = new Set([
-  "ground-data.js"
+  "ground-data.js",
+  "index.js",
+  "Poland.js"
 ]);
 
 self.addEventListener("install", (event) => {
