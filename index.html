@@ -1515,7 +1515,30 @@ button:hover {
   stroke: #58d27e;
 }
 
+.taxi-chart-vfr-circuit-halo {
+  fill: none;
+  stroke: rgba(5, 5, 5, 0.72);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.taxi-chart-vfr-circuit-line {
+  fill: none;
+  stroke: #ff5f79;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.taxi-chart-vfr-circuit-point {
+  fill: #fffef7;
+  stroke: #ff5f79;
+}
+
 .taxi-chart-map.dark .taxi-chart-route-point {
+  fill: #050505;
+}
+
+.taxi-chart-map.dark .taxi-chart-vfr-circuit-point {
   fill: #050505;
 }
 
@@ -4817,7 +4840,8 @@ const DEFAULT_TAXI_OUT_ROUTE_DATA = {
 };
 const TAXI_OUT_ROUTE_DATA = mergeGroundDataSources(
   DEFAULT_TAXI_OUT_ROUTE_DATA,
-  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports
+  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports,
+  getWaypointPackageVfrCircuitGroundData()
 );
 const TAXI_CHART_PDF_FRAGMENT = "#toolbar=0&navpanes=0&scrollbar=0&page=1&view=Fit&zoom=page-fit";
 const TAXI_CHART_PDF_DB_NAME = "nordsweet-ground-editor-chart-pdfs";
@@ -5625,10 +5649,66 @@ function mergeGroundDataSources(...sources) {
       if (!airportIcao) {
         return;
       }
-      merged[airportIcao] = Object.assign({}, merged[airportIcao] || {}, cleanSource[icao]);
+      const existing = merged[airportIcao] || {};
+      const incoming = cleanSource[icao] || {};
+      const next = Object.assign({}, existing, incoming);
+      if (existing.chartOverlay || incoming.chartOverlay) {
+        next.chartOverlay = Object.assign({}, existing.chartOverlay || {}, incoming.chartOverlay || {});
+        if (existing.chartOverlay && incoming.chartOverlay && existing.chartOverlay.vfrCircuits && incoming.chartOverlay.vfrCircuits) {
+          next.chartOverlay.vfrCircuits = Object.assign({}, existing.chartOverlay.vfrCircuits || {}, incoming.chartOverlay.vfrCircuits || {});
+        }
+        if (existing.chartOverlay && incoming.chartOverlay && (Array.isArray(existing.chartOverlay.intersections) || Array.isArray(incoming.chartOverlay.intersections))) {
+          const intersections = new Map();
+          (Array.isArray(existing.chartOverlay.intersections) ? existing.chartOverlay.intersections : []).forEach((intersection) => {
+            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
+            if (id) {
+              intersections.set(id, intersection);
+            }
+          });
+          (Array.isArray(incoming.chartOverlay.intersections) ? incoming.chartOverlay.intersections : []).forEach((intersection) => {
+            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
+            if (id) {
+              intersections.set(id, intersection);
+            }
+          });
+          next.chartOverlay.intersections = Array.from(intersections.values());
+        }
+      }
+      merged[airportIcao] = next;
     });
     return merged;
   }, {});
+}
+
+function getWaypointPackageVfrCircuitGroundData() {
+  const result = {};
+  getPlannerWaypointDataPackages().forEach((dataPackage) => {
+    const packageCircuits = dataPackage && dataPackage.vfrCircuits && typeof dataPackage.vfrCircuits === "object" && !Array.isArray(dataPackage.vfrCircuits)
+      ? dataPackage.vfrCircuits
+      : {};
+    Object.keys(packageCircuits).forEach((airport) => {
+      const airportIcao = cleanAtisValue(airport).toUpperCase();
+      const data = packageCircuits[airport] || {};
+      if (!airportIcao || !data || typeof data !== "object") {
+        return;
+      }
+      const chartOverlay = {
+        chart: clonePlainData(data.chart || {}),
+        intersections: Array.isArray(data.intersections) ? clonePlainData(data.intersections) : [],
+        vfrCircuits: clonePlainData(data.circuits || data.vfrCircuits || {})
+      };
+      if (!result[airportIcao]) {
+        result[airportIcao] = {};
+      }
+      result[airportIcao].chartOverlay = Object.assign({}, result[airportIcao].chartOverlay || {}, chartOverlay);
+      result[airportIcao].chartOverlay.vfrCircuits = Object.assign(
+        {},
+        result[airportIcao].chartOverlay.vfrCircuits || {},
+        chartOverlay.vfrCircuits || {}
+      );
+    });
+  });
+  return result;
 }
 
 function normalizeAirport(rawAirport) {
@@ -6240,6 +6320,29 @@ function getFuelTankCapacityLiters() {
   return toNumber(usableFuelField && usableFuelField.max, 0);
 }
 
+function getSelectedAircraftBasicFuelFlowLph() {
+  const profile = getSelectedAircraftProfile();
+  const performance = profile && profile.performance && typeof profile.performance === "object"
+    ? profile.performance
+    : null;
+  const basic = performance && performance.basic && typeof performance.basic === "object"
+    ? performance.basic
+    : null;
+  const value = toNumber(
+    basic && (
+      basic.fuelFlowLphAtSeaLevel ||
+      basic.fuelFlowLphSL ||
+      basic.fuelFlowLph
+    ),
+    NaN
+  );
+  return Number.isFinite(value) && value > 0 ? value : NaN;
+}
+
+function selectedAircraftUsesP2006TPerformanceTables() {
+  return normalizeAircraftType(state.selectedAircraftType) === "P2006T";
+}
+
 function createEmptyFuelPlanningState() {
   return FUEL_PLANNING_ROWS.reduce((rows, row) => {
     if (!row.calculated) {
@@ -6625,6 +6728,10 @@ function getPlannerCruiseSpeedKt() {
 }
 
 function getPlannerEcoCruisePerformance() {
+  if (!selectedAircraftUsesP2006TPerformanceTables()) {
+    return null;
+  }
+
   const cruiseAltitudeContext = getPlannerCruiseAltitudeContext();
   const plan = buildPlannerRoutePlan();
   const routeEconomy = getPlannerRouteCruiseEconomy(plan, "eco-distance");
@@ -7051,13 +7158,16 @@ function getFuelPlanningCruisePerformanceForPlanner() {
   const cruiseOatC = getCruiseOatCFromState();
   const windComponentKt = plan ? getPlannerRouteWindComponentKt(plan) : getCruiseWindComponentKtFromState();
   const plannerCruiseSpeedKt = getPlannerCruiseSpeedKt();
-  const cruisePerformance = getP2006TCruisePerformance(
-    cruiseAltitudeFt,
-    cruiseOatC,
-    windComponentKt,
-    getCruiseOptimizationMode(),
-    getCruiseManualTarget()
-  );
+  const cruisePerformance = selectedAircraftUsesP2006TPerformanceTables()
+    ? getP2006TCruisePerformance(
+        cruiseAltitudeFt,
+        cruiseOatC,
+        windComponentKt,
+        getCruiseOptimizationMode(),
+        getCruiseManualTarget()
+      )
+    : null;
+  const basicFuelFlowLph = getSelectedAircraftBasicFuelFlowLph();
 
   const performanceGroundSpeedKt = cruisePerformance && Number.isFinite(cruisePerformance.groundSpeedKt)
     ? Math.max(30, cruisePerformance.groundSpeedKt)
@@ -7072,7 +7182,9 @@ function getFuelPlanningCruisePerformanceForPlanner() {
     cruisePerformance,
     fuelFlowLph: cruisePerformance && Number.isFinite(cruisePerformance.fuelTotalLph)
       ? cruisePerformance.fuelTotalLph
-      : FUEL_DEPARTURE_ARRIVAL_FALLBACK_FUEL_LPH,
+      : Number.isFinite(basicFuelFlowLph)
+        ? basicFuelFlowLph
+        : FUEL_DEPARTURE_ARRIVAL_FALLBACK_FUEL_LPH,
     groundSpeedKt: Number.isFinite(plannerGroundSpeedKt) ? plannerGroundSpeedKt : performanceGroundSpeedKt,
     plannerCruiseSpeedKt,
     plannerSpeedOverride: Number.isFinite(plannerGroundSpeedKt),
@@ -7093,7 +7205,9 @@ function getFuelPlanningPlannedTripSuggestion() {
   }
 
   const cruiseContext = getFuelPlanningCruisePerformanceForPlanner();
-  const routeEconomy = getPlannerRouteCruiseEconomy(plan, getCruiseOptimizationMode() === "manual" ? "manual" : "eco-distance");
+  const routeEconomy = selectedAircraftUsesP2006TPerformanceTables()
+    ? getPlannerRouteCruiseEconomy(plan, getCruiseOptimizationMode() === "manual" ? "manual" : "eco-distance")
+    : null;
   const routeDistanceNm = Math.max(0, toNumber(plan.totalDistanceNm, 0));
   const groundSpeedKt = routeEconomy && Number.isFinite(routeEconomy.averageGroundSpeedKt)
     ? Math.max(30, routeEconomy.averageGroundSpeedKt)
@@ -15608,7 +15722,7 @@ function normalizeAircraftRegistration(value) {
     return AIRCRAFT_DATA.normalizeRegistration(value);
   }
 
-  return cleanAtisValue(value).toUpperCase().replace(/\s+/g, "");
+  return cleanAtisValue(value).toUpperCase().replace(/[^A-Z0-9]+/g, "");
 }
 
 function normalizeAircraftType(value) {
@@ -15617,6 +15731,21 @@ function normalizeAircraftType(value) {
   }
 
   return cleanAtisValue(value).toUpperCase();
+}
+
+function normalizeAircraftDataFileIcao(value) {
+  return cleanAtisValue(value).toUpperCase().replace(/[^A-Z0-9]+/g, "") || "AIRCRAFT";
+}
+
+function formatAircraftRegistrationForDataFile(value) {
+  const normalized = normalizeAircraftRegistration(value);
+  if (!normalized) {
+    return "";
+  }
+  if (/^[A-Z]{2}[A-Z0-9]{3,}$/.test(normalized)) {
+    return normalized.slice(0, 2) + "-" + normalized.slice(2);
+  }
+  return normalized;
 }
 
 function getAircraftProfile(type, registration) {
@@ -15665,9 +15794,10 @@ function getAircraftFileTypeName(type) {
 }
 
 function getAircraftRegistrationFileName(type, registration) {
-  const fileType = getAircraftFileTypeName(type);
-  const normalizedRegistration = normalizeAircraftRegistration(registration);
-  return fileType + (normalizedRegistration ? " " + normalizedRegistration : "") + " data";
+  const profile = getAircraftProfile(type, "");
+  const fileType = normalizeAircraftDataFileIcao(profile && (profile.icaoType || profile.type) || type);
+  const normalizedRegistration = formatAircraftRegistrationForDataFile(registration);
+  return fileType + (normalizedRegistration ? "." + normalizedRegistration : "") + "-data";
 }
 
 function getAircraftDataFileUrl(type, registration) {
@@ -19895,7 +20025,7 @@ function createChecklistRecord(name) {
         id: "main",
         title: "Items",
         items: [
-          createChecklistItem("Add exact AFM / POH item in checklist editor", "VERIFY")
+          createChecklistItem("Add exact AFM / POH item in airplane data editor", "VERIFY")
         ]
       }
     ]
@@ -21577,6 +21707,46 @@ function getTaxiChartPointString(points) {
     .join(" ");
 }
 
+function getTaxiChartVfrCircuitPoint(routeData, point) {
+  const intersectionId = normalizeGroundThingId(point && (point.intersectionId || point.sourceIntersectionId || point.id));
+  const intersection = intersectionId && routeData && routeData.chartOverlay && Array.isArray(routeData.chartOverlay.intersections)
+    ? routeData.chartOverlay.intersections.find((candidate) => normalizeGroundThingId(candidate && candidate.id) === intersectionId)
+    : null;
+  return {
+    id: intersectionId || "",
+    x: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.width, Number(intersection ? intersection.x : point && point.x))),
+    y: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.height, Number(intersection ? intersection.y : point && point.y)))
+  };
+}
+
+function renderTaxiChartVfrCircuits(routeData, lineWidth) {
+  const circuits = routeData && routeData.chartOverlay && routeData.chartOverlay.vfrCircuits && typeof routeData.chartOverlay.vfrCircuits === "object"
+    ? routeData.chartOverlay.vfrCircuits
+    : {};
+  return Object.keys(circuits)
+    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }))
+    .map((circuitId) => {
+      const circuit = circuits[circuitId] || {};
+      const points = (Array.isArray(circuit.points) ? circuit.points : [])
+        .map((point) => getTaxiChartVfrCircuitPoint(routeData, point))
+        .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+      const pointString = getTaxiChartPointString(points);
+      if (!points.length) {
+        return "";
+      }
+      const width = Math.max(3, toNumber(lineWidth, 7) * 0.86);
+      const haloWidth = width * 2.45;
+      const radius = Math.max(4.2, width * 0.75);
+      const pointStrokeWidth = Math.max(1.8, width * 0.3);
+      return [
+        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-halo" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>' : "",
+        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-line" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(width) + '" data-base-stroke-width="' + formatChartNumber(width) + '"><title>' + escapeHtml((circuit.label || circuit.id || circuitId) + " VFR circuit") + '</title></polyline>' : "",
+        points.map((point, index) => '<circle class="taxi-chart-vfr-circuit-point" cx="' + formatChartNumber(point.x) + '" cy="' + formatChartNumber(point.y) + '" r="' + formatChartNumber(radius) + '" stroke-width="' + formatChartNumber(pointStrokeWidth) + '" data-base-r="' + formatChartNumber(radius) + '" data-base-stroke-width="' + formatChartNumber(pointStrokeWidth) + '"><title>' + escapeHtml((circuit.id || circuitId) + " point " + (index + 1)) + '</title></circle>').join("")
+      ].join("");
+    })
+    .join("");
+}
+
 function getTaxiChartRoutePointMarkup(points, lineWidth, options = {}) {
   const radius = Math.max(5, toNumber(lineWidth, 7) * 0.9);
   const pointStrokeWidth = Math.max(2.2, lineWidth * 0.32);
@@ -22287,6 +22457,7 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
   const routePointString = getTaxiChartPointString(routePoints);
   const routeWidth = Math.max(3, Math.min(toNumber(state.taxiChartRouteWidth, 7), 16));
   const haloWidth = routeWidth * 2.6;
+  const vfrCircuitMarkup = renderTaxiChartVfrCircuits(getTaxiOutRouteData(airport), routeWidth);
   const savedTransform = state.taxiChartTransform && typeof state.taxiChartTransform === "object"
     ? state.taxiChartTransform
     : {};
@@ -22344,6 +22515,7 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
       : '<div class="taxi-chart-empty">' + (isLoadingStoredPdf ? "Restoring stored airport chart..." : "Load airport chart PDF to use it as taxi background.") + "</div>",
     '<svg class="taxi-chart-overlay" data-taxi-chart-overlay viewBox="0 0 ' + TAXI_CHART_VIEWBOX.width + " " + TAXI_CHART_VIEWBOX.height + '" preserveAspectRatio="none" aria-label="Taxi route overlay">',
     '<rect x="0" y="0" width="' + TAXI_CHART_VIEWBOX.width + '" height="' + TAXI_CHART_VIEWBOX.height + '" fill="transparent" pointer-events="all"/>',
+    vfrCircuitMarkup,
     '<polyline class="taxi-chart-route-halo" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>',
     '<polyline class="taxi-chart-route-line" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(routeWidth) + '" data-base-stroke-width="' + formatChartNumber(routeWidth) + '"></polyline>',
     getTaxiChartRoutePointMarkup(routePoints, routeWidth, { hideFirstPoint: isTaxiIn }),
