@@ -2617,7 +2617,8 @@ window.NORDSWEET_GROUND_DATA = {
             ]
           }
         ],
-        "taxiwayPaths": {}
+        "taxiwayPaths": {},
+        "vfrCircuits": {}
       },
       "airport": {
         "icao": "EPKK",
@@ -3513,8 +3514,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-461-575",
             "label": "INT-461-575",
-            "x": 461,
-            "y": 575,
+            "x": 460.837,
+            "y": 576.642,
             "members": [
               "20/A1"
             ]
@@ -3522,8 +3523,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-462-579",
             "label": "INT-462-579",
-            "x": 462,
-            "y": 579,
+            "x": 461.099,
+            "y": 581.155,
             "members": [
               "20L/A1"
             ]
@@ -3531,8 +3532,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-464-585",
             "label": "INT-464-585",
-            "x": 464,
-            "y": 585,
+            "x": 463.634,
+            "y": 586.446,
             "members": [
               "19/A1"
             ]
@@ -3540,8 +3541,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-466-593",
             "label": "INT-466-593",
-            "x": 466,
-            "y": 593,
+            "x": 465.819,
+            "y": 594.849,
             "members": [
               "18R/A1"
             ]
@@ -3552,7 +3553,6 @@ window.NORDSWEET_GROUND_DATA = {
             "x": 467,
             "y": 207,
             "members": [
-              "D1",
               "D2",
               "HP10"
             ]
@@ -3570,8 +3570,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-467-595",
             "label": "INT-467-595",
-            "x": 479,
-            "y": 583,
+            "x": 479.018,
+            "y": 586.912,
             "members": [
               "18/A1",
               "G"
@@ -3580,8 +3580,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-468-597",
             "label": "INT-468-597",
-            "x": 467,
-            "y": 594,
+            "x": 466.781,
+            "y": 595.938,
             "members": [
               "18/A1"
             ]
@@ -3589,8 +3589,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-470-565",
             "label": "INT-470-565",
-            "x": 472,
-            "y": 564,
+            "x": 472.2,
+            "y": 565.594,
             "members": [
               "20/A1",
               "G"
@@ -3599,8 +3599,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-470-589",
             "label": "INT-470-589",
-            "x": 478,
-            "y": 581,
+            "x": 477.882,
+            "y": 582.4,
             "members": [
               "18R/A1",
               "G"
@@ -3609,8 +3609,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-470-606",
             "label": "INT-470-606",
-            "x": 470,
-            "y": 606,
+            "x": 469.927,
+            "y": 607.92,
             "members": [
               "17L/A1"
             ]
@@ -3618,8 +3618,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-471-577",
             "label": "INT-471-577",
-            "x": 476,
-            "y": 573,
+            "x": 475.872,
+            "y": 575.086,
             "members": [
               "19/A1",
               "G"
@@ -3628,8 +3628,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-471-603",
             "label": "INT-471-603",
-            "x": 470,
-            "y": 604,
+            "x": 470.277,
+            "y": 606.208,
             "members": [
               "17/A1"
             ]
@@ -3637,8 +3637,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-472-562",
             "label": "INT-472-562",
-            "x": 472,
-            "y": 562,
+            "x": 471.763,
+            "y": 564.504,
             "members": [
               "42/A1",
               "42A/A1",
@@ -3648,8 +3648,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-474-568",
             "label": "INT-474-568",
-            "x": 474,
-            "y": 568,
+            "x": 473.337,
+            "y": 568.239,
             "members": [
               "20L/A1",
               "G"
@@ -3658,8 +3658,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-475-572",
             "label": "INT-475-572",
-            "x": 475,
-            "y": 572,
+            "x": 475.522,
+            "y": 573.53,
             "members": [
               "41/A1",
               "41A/A1",
@@ -3669,8 +3669,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-475-616",
             "label": "INT-475-616",
-            "x": 475,
-            "y": 616,
+            "x": 474.91,
+            "y": 617.879,
             "members": [
               "16/A1"
             ]
@@ -3688,8 +3688,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-478-556",
             "label": "INT-478-556",
-            "x": 478,
-            "y": 556,
+            "x": 478.581,
+            "y": 557.969,
             "members": [
               "42/A1"
             ]
@@ -3697,8 +3697,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-478-582",
             "label": "INT-478-582",
-            "x": 478,
-            "y": 582,
+            "x": 478.319,
+            "y": 583.645,
             "members": [
               "40/A1",
               "40A/A1",
@@ -3708,8 +3708,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-478-626",
             "label": "INT-478-626",
-            "x": 478,
-            "y": 626,
+            "x": 477.969,
+            "y": 628.305,
             "members": [
               "15/A1"
             ]
@@ -3717,8 +3717,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-478-629",
             "label": "INT-478-629",
-            "x": 478,
-            "y": 629,
+            "x": 478.319,
+            "y": 631.262,
             "members": [
               "15L/A1"
             ]
@@ -3726,8 +3726,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-480-637",
             "label": "INT-480-637",
-            "x": 480,
-            "y": 637,
+            "x": 479.98,
+            "y": 638.731,
             "members": [
               "14/A1"
             ]
@@ -3745,8 +3745,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-481-566",
             "label": "INT-481-566",
-            "x": 481,
-            "y": 566,
+            "x": 481.466,
+            "y": 567.928,
             "members": [
               "41/A1"
             ]
@@ -3754,8 +3754,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-482-553",
             "label": "INT-482-553",
-            "x": 482,
-            "y": 553,
+            "x": 481.816,
+            "y": 554.39,
             "members": [
               "42A/A1"
             ]
@@ -3763,8 +3763,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-482-593",
             "label": "INT-482-593",
-            "x": 482.204,
-            "y": 593.564,
+            "x": 481.816,
+            "y": 594.693,
             "members": [
               "B",
               "G"
@@ -3773,8 +3773,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-482-647",
             "label": "INT-482-647",
-            "x": 482,
-            "y": 647,
+            "x": 482.253,
+            "y": 648.69,
             "members": [
               "13/A1"
             ]
@@ -3782,8 +3782,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-483-596",
             "label": "INT-483-596",
-            "x": 483,
-            "y": 597,
+            "x": 482.952,
+            "y": 598.739,
             "members": [
               "17/A1",
               "17L/A1",
@@ -3794,8 +3794,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-484-576",
             "label": "INT-484-576",
-            "x": 484,
-            "y": 576,
+            "x": 484.438,
+            "y": 577.42,
             "members": [
               "40/A1"
             ]
@@ -3803,8 +3803,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-485-562",
             "label": "INT-485-562",
-            "x": 485,
-            "y": 562,
+            "x": 485.225,
+            "y": 564.038,
             "members": [
               "41A/A1"
             ]
@@ -3812,8 +3812,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-485-657",
             "label": "INT-485-657",
-            "x": 485,
-            "y": 657,
+            "x": 484.438,
+            "y": 658.805,
             "members": [
               "12/A1"
             ]
@@ -3821,8 +3821,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-486-549",
             "label": "INT-486-549",
-            "x": 486,
-            "y": 549,
+            "x": 485.924,
+            "y": 550.032,
             "members": [
               "42/A1",
               "42A/A1",
@@ -3832,8 +3832,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-486-611",
             "label": "INT-486-611",
-            "x": 486,
-            "y": 611,
+            "x": 485.574,
+            "y": 611.499,
             "members": [
               "15L/A1",
               "G"
@@ -3842,8 +3842,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-487-666",
             "label": "INT-487-666",
-            "x": 487,
-            "y": 666,
+            "x": 487.235,
+            "y": 667.986,
             "members": [
               "11/A1"
             ]
@@ -3851,8 +3851,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-488-572",
             "label": "INT-488-572",
-            "x": 488,
-            "y": 572,
+            "x": 488.109,
+            "y": 573.53,
             "members": [
               "40A/A1"
             ]
@@ -3860,8 +3860,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-488-620",
             "label": "INT-488-620",
-            "x": 488,
-            "y": 620,
+            "x": 487.847,
+            "y": 622.392,
             "members": [
               "15/A1",
               "G"
@@ -3881,8 +3881,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-489-674",
             "label": "INT-489-674",
-            "x": 489,
-            "y": 674,
+            "x": 489.158,
+            "y": 676.856,
             "members": [
               "10/A1"
             ]
@@ -3890,8 +3890,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-490-630",
             "label": "INT-490-630",
-            "x": 490,
-            "y": 630,
+            "x": 490.032,
+            "y": 632.351,
             "members": [
               "14/A1",
               "G"
@@ -3900,8 +3900,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-491-685",
             "label": "INT-491-685",
-            "x": 491,
-            "y": 685,
+            "x": 490.732,
+            "y": 686.66,
             "members": [
               "9/A1"
             ]
@@ -3909,8 +3909,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-492-568",
             "label": "INT-492-568",
-            "x": 492,
-            "y": 568,
+            "x": 492.218,
+            "y": 569.017,
             "members": [
               "40/A1",
               "40A/A1",
@@ -3920,8 +3920,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-492-640",
             "label": "INT-492-640",
-            "x": 492,
-            "y": 640,
+            "x": 491.955,
+            "y": 643.244,
             "members": [
               "13/A1",
               "G"
@@ -3930,8 +3930,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-492-694",
             "label": "INT-492-694",
-            "x": 492,
-            "y": 694,
+            "x": 491.955,
+            "y": 696.774,
             "members": [
               "8/A1"
             ]
@@ -3939,8 +3939,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-494-651",
             "label": "INT-494-651",
-            "x": 494,
-            "y": 651,
+            "x": 494.228,
+            "y": 653.203,
             "members": [
               "12/A1",
               "G"
@@ -3949,8 +3949,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-494-705",
             "label": "INT-494-705",
-            "x": 494,
-            "y": 705,
+            "x": 493.529,
+            "y": 707.512,
             "members": [
               "7/A1"
             ]
@@ -3958,8 +3958,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-496-661",
             "label": "INT-496-661",
-            "x": 496,
-            "y": 661,
+            "x": 496.151,
+            "y": 663.162,
             "members": [
               "11/A1",
               "G"
@@ -3968,8 +3968,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-497-715",
             "label": "INT-497-715",
-            "x": 497,
-            "y": 715,
+            "x": 497.113,
+            "y": 717.782,
             "members": [
               "6/A1"
             ]
@@ -3977,8 +3977,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-498-585",
             "label": "INT-498-585",
-            "x": 498,
-            "y": 585,
+            "x": 497.987,
+            "y": 586.912,
             "members": [
               "B",
               "F"
@@ -3987,8 +3987,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-498-669",
             "label": "INT-498-669",
-            "x": 498,
-            "y": 669,
+            "x": 497.725,
+            "y": 671.721,
             "members": [
               "10/A1",
               "G"
@@ -4008,8 +4008,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-500-679",
             "label": "INT-500-679",
-            "x": 500,
-            "y": 679,
+            "x": 499.91,
+            "y": 681.524,
             "members": [
               "9/A1",
               "G"
@@ -4018,8 +4018,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-500-723",
             "label": "INT-500-723",
-            "x": 500,
-            "y": 723,
+            "x": 499.997,
+            "y": 725.562,
             "members": [
               "5/A1"
             ]
@@ -4027,8 +4027,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-502-688",
             "label": "INT-502-688",
-            "x": 502,
-            "y": 688,
+            "x": 501.571,
+            "y": 691.172,
             "members": [
               "8/A1",
               "G"
@@ -4037,8 +4037,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-502-727",
             "label": "INT-502-727",
-            "x": 502,
-            "y": 727,
+            "x": 501.833,
+            "y": 729.453,
             "members": [
               "5B/A1"
             ]
@@ -4046,8 +4046,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-502-731",
             "label": "INT-502-731",
-            "x": 502,
-            "y": 731,
+            "x": 502.445,
+            "y": 733.654,
             "members": [
               "4/A1"
             ]
@@ -4055,8 +4055,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-504-699",
             "label": "INT-504-699",
-            "x": 504,
-            "y": 699,
+            "x": 504.193,
+            "y": 700.976,
             "members": [
               "7/A1",
               "G"
@@ -4065,8 +4065,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-504-735",
             "label": "INT-504-735",
-            "x": 504,
-            "y": 735,
+            "x": 504.368,
+            "y": 738.323,
             "members": [
               "4B/A1"
             ]
@@ -4074,8 +4074,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-505-724",
             "label": "INT-505-724",
-            "x": 505,
-            "y": 724,
+            "x": 504.63,
+            "y": 726.652,
             "members": [
               "5A/A1"
             ]
@@ -4083,8 +4083,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-505-738",
             "label": "INT-505-738",
-            "x": 505,
-            "y": 738,
+            "x": 504.718,
+            "y": 741.435,
             "members": [
               "3/A1"
             ]
@@ -4092,8 +4092,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-506-706",
             "label": "INT-506-706",
-            "x": 506,
-            "y": 706,
+            "x": 506.553,
+            "y": 708.601,
             "members": [
               "6/A1",
               "G"
@@ -4102,8 +4102,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-507-732",
             "label": "INT-507-732",
-            "x": 507,
-            "y": 732,
+            "x": 507.165,
+            "y": 735.055,
             "members": [
               "4A/A1"
             ]
@@ -4111,8 +4111,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-507-743",
             "label": "INT-507-743",
-            "x": 507,
-            "y": 743,
+            "x": 506.816,
+            "y": 745.948,
             "members": [
               "3B/A1"
             ]
@@ -4120,8 +4120,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-507-746",
             "label": "INT-507-746",
-            "x": 507,
-            "y": 746,
+            "x": 507.253,
+            "y": 748.593,
             "members": [
               "2/A1"
             ]
@@ -4129,8 +4129,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-509-714",
             "label": "INT-509-714",
-            "x": 509,
-            "y": 714,
+            "x": 509.001,
+            "y": 716.693,
             "members": [
               "5/A1",
               "5A/A1",
@@ -4141,8 +4141,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-510-740",
             "label": "INT-510-740",
-            "x": 510,
-            "y": 740,
+            "x": 509.7,
+            "y": 742.68,
             "members": [
               "3A/A1"
             ]
@@ -4150,8 +4150,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-510-751",
             "label": "INT-510-751",
-            "x": 510,
-            "y": 751,
+            "x": 509.875,
+            "y": 754.195,
             "members": [
               "1/A1"
             ]
@@ -4159,8 +4159,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-511-579",
             "label": "INT-511-579",
-            "x": 511,
-            "y": 579,
+            "x": 511.186,
+            "y": 580.532,
             "members": [
               "B",
               "D1",
@@ -4170,8 +4170,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-512-722",
             "label": "INT-512-722",
-            "x": 512,
-            "y": 722,
+            "x": 511.361,
+            "y": 724.162,
             "members": [
               "4/A1",
               "4A/A1",
@@ -4184,8 +4184,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-512-748",
             "label": "INT-512-748",
-            "x": 512,
-            "y": 748,
+            "x": 511.886,
+            "y": 750.616,
             "members": [
               "2A/A1"
             ]
@@ -4193,8 +4193,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-514-729",
             "label": "INT-514-729",
-            "x": 514,
-            "y": 729,
+            "x": 513.896,
+            "y": 732.254,
             "members": [
               "3/A1",
               "3A/A1",
@@ -4207,8 +4207,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-516-737",
             "label": "INT-516-737",
-            "x": 516,
-            "y": 737,
+            "x": 516.431,
+            "y": 739.568,
             "members": [
               "2/A1",
               "2A/A1",
@@ -4220,8 +4220,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-519-745",
             "label": "INT-519-745",
-            "x": 519,
-            "y": 745,
+            "x": 518.791,
+            "y": 747.659,
             "members": [
               "1/A1",
               "G",
@@ -4231,8 +4231,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-521-574",
             "label": "INT-521-574",
-            "x": 521,
-            "y": 574,
+            "x": 521.215,
+            "y": 575.888,
             "members": [
               "B",
               "HP10",
@@ -4242,8 +4242,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-522-763",
             "label": "INT-522-763",
-            "x": 529,
-            "y": 762,
+            "x": 529.106,
+            "y": 765.555,
             "members": [
               "1B/A1",
               "H1",
@@ -4253,8 +4253,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-524-510",
             "label": "INT-524-510",
-            "x": 524.337,
-            "y": 510.166,
+            "x": 524.549,
+            "y": 511.546,
             "members": [
               "ARP"
             ]
@@ -4272,8 +4272,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-530-762",
             "label": "INT-530-762",
-            "x": 530,
-            "y": 762,
+            "x": 532.952,
+            "y": 764.621,
             "members": [
               "H1",
               "H2"
@@ -4282,8 +4282,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-533-568",
             "label": "INT-533-568",
-            "x": 533.236,
-            "y": 567.844,
+            "x": 533.278,
+            "y": 570.753,
             "members": [
               "B",
               "RW10",
@@ -4293,8 +4293,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-534-761",
             "label": "INT-534-761",
-            "x": 534,
-            "y": 761,
+            "x": 534.001,
+            "y": 764.621,
             "members": [
               "1A/A1",
               "H1",
@@ -4304,8 +4304,8 @@ window.NORDSWEET_GROUND_DATA = {
           {
             "id": "INT-536-743",
             "label": "INT-536-743",
-            "x": 536,
-            "y": 743,
+            "x": 536.274,
+            "y": 746.103,
             "members": [
               "A",
               "D1",
@@ -4663,35 +4663,35 @@ window.NORDSWEET_GROUND_DATA = {
         "taxiwayPaths": {
           "B": [
             {
-              "x": 533.236,
-              "y": 567.844,
+              "x": 533.278,
+              "y": 570.753,
               "intersectionId": "INT-533-568"
             },
             {
-              "x": 521,
-              "y": 574,
+              "x": 521.215,
+              "y": 575.888,
               "intersectionId": "INT-521-574"
             },
             {
-              "x": 511,
-              "y": 579,
+              "x": 511.186,
+              "y": 580.532,
               "intersectionId": "INT-511-579"
             },
             {
-              "x": 498,
-              "y": 585,
+              "x": 497.987,
+              "y": 586.912,
               "intersectionId": "INT-498-585"
             },
             {
-              "x": 482,
-              "y": 593,
+              "x": 481.816,
+              "y": 594.693,
               "intersectionId": "INT-482-593"
             }
           ],
           "D1": [
             {
-              "x": 511,
-              "y": 579,
+              "x": 511.186,
+              "y": 580.532,
               "intersectionId": "INT-511-579"
             },
             {
@@ -4700,8 +4700,8 @@ window.NORDSWEET_GROUND_DATA = {
               "intersectionId": "INT-530-703"
             },
             {
-              "x": 536,
-              "y": 743,
+              "x": 536.274,
+              "y": 746.103,
               "intersectionId": "INT-536-743"
             }
           ],
@@ -4737,149 +4737,150 @@ window.NORDSWEET_GROUND_DATA = {
               "intersectionId": "INT-467-284"
             },
             {
-              "x": 511,
-              "y": 579,
+              "x": 511.186,
+              "y": 580.532,
               "intersectionId": "INT-511-579"
             }
           ],
           "G": [
             {
-              "x": 472,
-              "y": 562,
+              "x": 471.763,
+              "y": 564.504,
               "intersectionId": "INT-472-562"
             },
             {
-              "x": 472,
-              "y": 564,
+              "x": 472.2,
+              "y": 565.594,
               "intersectionId": "INT-470-565"
             },
             {
-              "x": 474,
-              "y": 568,
+              "x": 473.337,
+              "y": 568.239,
               "intersectionId": "INT-474-568"
             },
             {
-              "x": 475,
-              "y": 572,
+              "x": 475.522,
+              "y": 573.53,
               "intersectionId": "INT-475-572"
             },
             {
-              "x": 476,
-              "y": 573,
+              "x": 475.872,
+              "y": 575.086,
               "intersectionId": "INT-471-577"
             },
             {
-              "x": 478,
-              "y": 581,
+              "x": 477.882,
+              "y": 582.4,
               "intersectionId": "INT-470-589"
             },
             {
-              "x": 478,
-              "y": 582,
+              "x": 478.319,
+              "y": 583.645,
               "intersectionId": "INT-478-582"
             },
             {
-              "x": 479,
-              "y": 583,
+              "x": 479.018,
+              "y": 586.912,
               "intersectionId": "INT-467-595"
             },
             {
-              "x": 482,
-              "y": 593,
+              "x": 481.816,
+              "y": 594.693,
               "intersectionId": "INT-482-593"
             },
             {
-              "x": 483,
-              "y": 597,
+              "x": 482.952,
+              "y": 598.739,
               "intersectionId": "INT-483-596"
             },
             {
-              "x": 486,
-              "y": 611,
+              "x": 485.574,
+              "y": 611.499,
               "intersectionId": "INT-486-611"
             },
             {
-              "x": 488,
-              "y": 620,
+              "x": 487.847,
+              "y": 622.392,
               "intersectionId": "INT-488-620"
             },
             {
-              "x": 490,
-              "y": 630,
+              "x": 490.032,
+              "y": 632.351,
               "intersectionId": "INT-490-630"
             },
             {
-              "x": 492,
-              "y": 640,
+              "x": 491.955,
+              "y": 643.244,
               "intersectionId": "INT-492-640"
             },
             {
-              "x": 494,
-              "y": 651,
+              "x": 494.228,
+              "y": 653.203,
               "intersectionId": "INT-494-651"
             },
             {
-              "x": 496,
-              "y": 661,
+              "x": 496.151,
+              "y": 663.162,
               "intersectionId": "INT-496-661"
             },
             {
-              "x": 498,
-              "y": 669,
+              "x": 497.725,
+              "y": 671.721,
               "intersectionId": "INT-498-669"
             },
             {
-              "x": 500,
-              "y": 679,
+              "x": 499.91,
+              "y": 681.524,
               "intersectionId": "INT-500-679"
             },
             {
-              "x": 502,
-              "y": 688,
+              "x": 501.571,
+              "y": 691.172,
               "intersectionId": "INT-502-688"
             },
             {
-              "x": 504,
-              "y": 699,
+              "x": 504.193,
+              "y": 700.976,
               "intersectionId": "INT-504-699"
             },
             {
-              "x": 506,
-              "y": 706,
+              "x": 506.553,
+              "y": 708.601,
               "intersectionId": "INT-506-706"
             },
             {
-              "x": 509,
-              "y": 714,
+              "x": 509.001,
+              "y": 716.693,
               "intersectionId": "INT-509-714"
             },
             {
-              "x": 512,
-              "y": 722,
+              "x": 511.361,
+              "y": 724.162,
               "intersectionId": "INT-512-722"
             },
             {
-              "x": 514,
-              "y": 729,
+              "x": 513.896,
+              "y": 732.254,
               "intersectionId": "INT-514-729"
             },
             {
-              "x": 516,
-              "y": 737,
+              "x": 516.431,
+              "y": 739.568,
               "intersectionId": "INT-516-737"
             },
             {
-              "x": 519,
-              "y": 745,
+              "x": 518.791,
+              "y": 747.659,
               "intersectionId": "INT-519-745"
             },
             {
-              "x": 536,
-              "y": 743,
+              "x": 536.274,
+              "y": 746.103,
               "intersectionId": "INT-536-743"
             }
           ]
-        }
+        },
+        "vfrCircuits": {}
       },
       "airport": {
         "icao": "EPPO",
@@ -5479,7 +5480,8 @@ window.NORDSWEET_GROUND_DATA = {
           "aspectRatio": 1.7777777777777777,
           "color": true
         },
-        "taxiwayPaths": {}
+        "taxiwayPaths": {},
+        "vfrCircuits": {}
       },
       "airport": {
         "icao": "EPZG",
@@ -5766,7 +5768,8 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        }
+        },
+        "vfrCircuits": {}
       }
     },
     "EPPI": {
@@ -6026,8 +6029,8 @@ window.NORDSWEET_GROUND_DATA = {
               "intersectionId": "INT-396-518"
             },
             {
-              "x": 395.4,
-              "y": 562.451,
+              "x": 395.343,
+              "y": 564.268,
               "intersectionId": "INT-395-562"
             },
             {
@@ -6059,8 +6062,8 @@ window.NORDSWEET_GROUND_DATA = {
               "intersectionId": "INT-410-514"
             },
             {
-              "x": 424.26,
-              "y": 516.443,
+              "x": 424.36,
+              "y": 516.887,
               "intersectionId": "INT-424-516"
             },
             {
@@ -6149,7 +6152,8 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        }
+        },
+        "vfrCircuits": {}
       }
     },
     "EPLS": {
@@ -6703,13 +6707,14 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        }
+        },
+        "vfrCircuits": {}
       }
     },
     "EPNL": {
       "airport": {
         "icao": "EPNL",
-        "name": "EPNL",
+        "name": "Łososina Dolna",
         "elevation": 833,
         "atisProfile": "PL",
         "lat": 49.745556,
@@ -6730,8 +6735,8 @@ window.NORDSWEET_GROUND_DATA = {
             "magHdg": 37,
             "threshold": {
               "id": "THR04",
-              "lat": 49.742444,
-              "lon": 20.619417
+              "lat": 49.7425,
+              "lon": 20.619444
             },
             "surface": "grass",
             "slope": 0,
@@ -6749,8 +6754,8 @@ window.NORDSWEET_GROUND_DATA = {
             "magHdg": 217,
             "threshold": {
               "id": "THR22",
-              "lat": 49.748,
-              "lon": 20.627056
+              "lat": 49.748056,
+              "lon": 20.626944
             },
             "surface": "grass",
             "slope": 0,
@@ -6878,7 +6883,612 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
+        },
+        "vfrCircuits": {}
+      }
+    },
+    "EPBC": {
+      "airport": {
+        "icao": "EPBC",
+        "name": "Warszawa - Babice",
+        "elevation": 348,
+        "atisProfile": "PL",
+        "lat": 52.269167,
+        "lon": 20.907222,
+        "arp": {
+          "id": "ARP",
+          "lat": 52.269167,
+          "lon": 20.907222
+        },
+        "sampleMetar": "",
+        "weatherSourceIcao": "EPWA",
+        "temperatureOffsetC": 0,
+        "runways": [
+          {
+            "id": "10R",
+            "hdg": 98,
+            "trueHdg": 102,
+            "magHdg": 98,
+            "threshold": {
+              "id": "THR10R",
+              "lat": 52.270556,
+              "lon": 20.897778
+            },
+            "surface": "concrete",
+            "slope": 0,
+            "length_m": 1301,
+            "width_m": 90,
+            "tora": 1301,
+            "toda": 1301,
+            "asda": 1301,
+            "lda": 1301
+          },
+          {
+            "id": "28L",
+            "hdg": 278,
+            "trueHdg": 282,
+            "magHdg": 278,
+            "threshold": {
+              "id": "THR28L",
+              "lat": 52.267778,
+              "lon": 20.916389
+            },
+            "surface": "paved",
+            "slope": 0,
+            "length_m": 1301,
+            "width_m": 90,
+            "tora": 1301,
+            "toda": 1301,
+            "asda": 1301,
+            "lda": 1301
+          },
+          {
+            "id": "10L",
+            "hdg": 98,
+            "trueHdg": 102,
+            "magHdg": 98,
+            "threshold": {
+              "id": "THR10L",
+              "lat": 52.271111,
+              "lon": 20.902222
+            },
+            "surface": "grass",
+            "slope": 0,
+            "length_m": 1000,
+            "width_m": 30,
+            "tora": 1000,
+            "toda": 1000,
+            "asda": 1000,
+            "lda": 1000
+          },
+          {
+            "id": "28R",
+            "hdg": 278,
+            "trueHdg": 282,
+            "magHdg": 278,
+            "threshold": {
+              "id": "THR28R",
+              "lat": 52.269167,
+              "lon": 20.916667
+            },
+            "surface": "grass",
+            "slope": 0,
+            "length_m": 1000,
+            "width_m": 150,
+            "tora": 1000,
+            "toda": 1000,
+            "asda": 1000,
+            "lda": 1000
+          }
+        ]
+      },
+      "elements": [
+        {
+          "id": "ARP",
+          "type": "arp",
+          "label": "ARP"
+        },
+        {
+          "id": "A1",
+          "type": "taxiway",
+          "label": "Taxiway A1"
+        },
+        {
+          "id": "A2",
+          "type": "taxiway",
+          "label": "Taxiway A2"
+        },
+        {
+          "id": "B1",
+          "type": "taxiway",
+          "label": "Taxiway B1"
+        },
+        {
+          "id": "B2",
+          "type": "taxiway",
+          "label": "Taxiway B2"
+        },
+        {
+          "id": "C",
+          "type": "taxiway",
+          "label": "Taxiway C"
+        },
+        {
+          "id": "D1",
+          "type": "taxiway",
+          "label": "Taxiway D1"
+        },
+        {
+          "id": "D2",
+          "type": "taxiway",
+          "label": "Taxiway D2"
+        },
+        {
+          "id": "HP28L",
+          "type": "holdingPoint",
+          "label": "Holding Point HP28L"
+        },
+        {
+          "id": "RW28L",
+          "type": "runway",
+          "label": "RWY 28L"
+        },
+        {
+          "id": "HP28R",
+          "type": "holdingPoint",
+          "label": "Holding Point HP28R"
+        },
+        {
+          "id": "RW28R",
+          "type": "runway",
+          "label": "RWY 28R"
+        },
+        {
+          "id": "HP10R",
+          "type": "holdingPoint",
+          "label": "Holding Point HP10R"
+        },
+        {
+          "id": "RW10R",
+          "type": "runway",
+          "label": "RWY 10R"
+        },
+        {
+          "id": "HP10L",
+          "type": "holdingPoint",
+          "label": "Holding Point HP10L"
+        },
+        {
+          "id": "RW10L",
+          "type": "runway",
+          "label": "RWY 10L"
+        },
+        {
+          "id": "APRON1",
+          "type": "apron",
+          "label": "APRON 1"
+        },
+        {
+          "id": "APRON2",
+          "type": "apron",
+          "label": "APRON 2"
+        },
+        {
+          "id": "APRON3",
+          "type": "apron",
+          "label": "APRON 3"
+        },
+        {
+          "id": "HANGAR/A3",
+          "type": "stand",
+          "label": "Stand HANGAR"
+        },
+        {
+          "id": "HANGAR/A2",
+          "type": "stand",
+          "label": "Stand HANGAR"
+        },
+        {
+          "id": "1/A1",
+          "type": "stand",
+          "label": "Stand 1"
         }
+      ],
+      "aprons": [
+        {
+          "id": "APRON1",
+          "label": "APRON 1",
+          "stands": [
+            {
+              "id": "1/A1",
+              "label": "Stand 1",
+              "startOptions": []
+            }
+          ]
+        },
+        {
+          "id": "APRON2",
+          "label": "APRON 2",
+          "stands": [
+            {
+              "id": "HANGAR/A2",
+              "label": "Stand HANGAR",
+              "startOptions": []
+            }
+          ]
+        },
+        {
+          "id": "APRON3",
+          "label": "APRON 3",
+          "stands": [
+            {
+              "id": "HANGAR/A3",
+              "label": "Stand HANGAR",
+              "startOptions": []
+            }
+          ]
+        }
+      ],
+      "connections": {
+        "ARP": [],
+        "A1": [],
+        "A2": [],
+        "B1": [],
+        "B2": [],
+        "C": [],
+        "D1": [],
+        "D2": [],
+        "HP28L": [
+          "RW28L"
+        ],
+        "RW28L": [
+          "HP28L"
+        ],
+        "HP28R": [
+          "RW28R"
+        ],
+        "RW28R": [
+          "HP28R"
+        ],
+        "HP10R": [
+          "RW10R"
+        ],
+        "RW10R": [
+          "HP10R"
+        ],
+        "HP10L": [
+          "RW10L"
+        ],
+        "RW10L": [
+          "HP10L"
+        ],
+        "APRON1": [],
+        "APRON2": [],
+        "APRON3": [],
+        "HANGAR/A3": [],
+        "HANGAR/A2": [],
+        "1/A1": []
+      },
+      "expansions": {},
+      "chartOverlay": {
+        "intersections": [
+          {
+            "id": "INT-210-283",
+            "label": "INT-210-283",
+            "x": 209.976,
+            "y": 282.982,
+            "members": [
+              "1/A1"
+            ]
+          },
+          {
+            "id": "INT-214-294",
+            "label": "INT-214-294",
+            "x": 214.161,
+            "y": 293.702,
+            "members": [
+              "B2",
+              "D1"
+            ]
+          },
+          {
+            "id": "INT-215-284",
+            "label": "INT-215-284",
+            "x": 215.134,
+            "y": 283.836,
+            "members": [
+              "1/A1",
+              "B2"
+            ]
+          },
+          {
+            "id": "INT-219-245",
+            "label": "INT-219-245",
+            "x": 219.318,
+            "y": 245.02,
+            "members": [
+              "B2",
+              "HP10R"
+            ]
+          },
+          {
+            "id": "INT-221-222",
+            "label": "INT-221-222",
+            "x": 220.517,
+            "y": 222.387,
+            "members": [
+              "B1",
+              "B2",
+              "RW10R"
+            ]
+          },
+          {
+            "id": "INT-224-208",
+            "label": "INT-224-208",
+            "x": 223.516,
+            "y": 208.295,
+            "members": [
+              "B1",
+              "HP10R"
+            ]
+          },
+          {
+            "id": "INT-228-156",
+            "label": "INT-228-156",
+            "x": 229.075,
+            "y": 157.127,
+            "members": [
+              "B1",
+              "HANGAR/A2",
+              "HANGAR/A3"
+            ]
+          },
+          {
+            "id": "INT-260-200",
+            "label": "INT-260-200",
+            "x": 260.441,
+            "y": 200.223,
+            "members": [
+              "RW10L"
+            ]
+          },
+          {
+            "id": "INT-265-181",
+            "label": "INT-265-181",
+            "x": 265.044,
+            "y": 180.629,
+            "members": [
+              "HANGAR/A2",
+              "HANGAR/A3",
+              "HP10L"
+            ]
+          },
+          {
+            "id": "INT-286-245",
+            "label": "INT-286-245",
+            "x": 283.031,
+            "y": 243.389,
+            "members": [
+              "A1",
+              "RW10R",
+              "RW28L"
+            ]
+          },
+          {
+            "id": "INT-291-270",
+            "label": "INT-291-270",
+            "x": 290.683,
+            "y": 269.574,
+            "members": [
+              "A1",
+              "HP10R",
+              "HP28L"
+            ]
+          },
+          {
+            "id": "INT-305-252",
+            "label": "INT-305-252",
+            "x": 305.479,
+            "y": 251.946,
+            "members": [
+              "ARP"
+            ]
+          },
+          {
+            "id": "INT-308-326",
+            "label": "INT-308-326",
+            "x": 308.074,
+            "y": 325.73,
+            "members": [
+              "A1",
+              "A2",
+              "D1"
+            ]
+          },
+          {
+            "id": "INT-333-608",
+            "label": "INT-333-608",
+            "x": 333.383,
+            "y": 607.602,
+            "members": [
+              "A1",
+              "A2"
+            ]
+          },
+          {
+            "id": "INT-367-523",
+            "label": "INT-367-523",
+            "x": 367.332,
+            "y": 522.559,
+            "members": [
+              "A1",
+              "A2"
+            ]
+          },
+          {
+            "id": "INT-380-351",
+            "label": "INT-380-351",
+            "x": 379.678,
+            "y": 351.138,
+            "members": [
+              "C",
+              "D2"
+            ]
+          },
+          {
+            "id": "INT-385-302",
+            "label": "INT-385-302",
+            "x": 384.836,
+            "y": 302.029,
+            "members": [
+              "C",
+              "HP28L"
+            ]
+          },
+          {
+            "id": "INT-386-221",
+            "label": "INT-386-221",
+            "x": 385.917,
+            "y": 221.242,
+            "members": [
+              "HANGAR/A2",
+              "HANGAR/A3",
+              "HP28R"
+            ]
+          },
+          {
+            "id": "INT-391-281",
+            "label": "INT-391-281",
+            "x": 390.593,
+            "y": 280.677,
+            "members": [
+              "C",
+              "RW28L"
+            ]
+          },
+          {
+            "id": "INT-392-245",
+            "label": "INT-392-245",
+            "x": 391.52,
+            "y": 245.467,
+            "members": [
+              "RW28R"
+            ]
+          }
+        ],
+        "taxiwayPaths": {
+          "A1": [
+            {
+              "x": 283.031,
+              "y": 243.389,
+              "intersectionId": "INT-286-245"
+            },
+            {
+              "x": 290.683,
+              "y": 269.574,
+              "intersectionId": "INT-291-270"
+            },
+            {
+              "x": 308.074,
+              "y": 325.73,
+              "intersectionId": "INT-308-326"
+            }
+          ],
+          "A2": [
+            {
+              "x": 308.074,
+              "y": 325.73,
+              "intersectionId": "INT-308-326"
+            },
+            {
+              "x": 367.332,
+              "y": 522.559,
+              "intersectionId": "INT-367-523"
+            },
+            {
+              "x": 333.383,
+              "y": 607.602,
+              "intersectionId": "INT-333-608"
+            }
+          ],
+          "B1": [
+            {
+              "x": 229.075,
+              "y": 157.127,
+              "intersectionId": "INT-228-156"
+            },
+            {
+              "x": 223.516,
+              "y": 208.295,
+              "intersectionId": "INT-224-208"
+            },
+            {
+              "x": 220.517,
+              "y": 222.387,
+              "intersectionId": "INT-221-222"
+            }
+          ],
+          "B2": [
+            {
+              "x": 220.517,
+              "y": 222.387,
+              "intersectionId": "INT-221-222"
+            },
+            {
+              "x": 219.318,
+              "y": 245.02,
+              "intersectionId": "INT-219-245"
+            },
+            {
+              "x": 215.134,
+              "y": 283.836,
+              "intersectionId": "INT-215-284"
+            },
+            {
+              "x": 214.161,
+              "y": 293.702,
+              "intersectionId": "INT-214-294"
+            }
+          ],
+          "C": [
+            {
+              "x": 379.678,
+              "y": 351.138,
+              "intersectionId": "INT-380-351"
+            },
+            {
+              "x": 384.836,
+              "y": 302.029,
+              "intersectionId": "INT-385-302"
+            },
+            {
+              "x": 390.593,
+              "y": 280.677,
+              "intersectionId": "INT-391-281"
+            }
+          ],
+          "D1": [
+            {
+              "x": 214.161,
+              "y": 293.702,
+              "intersectionId": "INT-214-294"
+            },
+            {
+              "x": 308.074,
+              "y": 325.73,
+              "intersectionId": "INT-308-326"
+            }
+          ]
+        },
+        "chart": {
+          "title": "AD_4_EPBC_2_upscaled_400.pdf",
+          "src": "./charts/AD_4_EPBC_2_upscaled_400.pdf",
+          "renderScale": 8,
+          "maxScale": 10,
+          "aspectRatio": 1.7777777777777777,
+          "color": true
+        },
+        "vfrCircuits": {}
       }
     }
   }
