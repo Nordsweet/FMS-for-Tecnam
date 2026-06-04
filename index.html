@@ -19965,13 +19965,12 @@ function getChecklistEditorDataStore() {
 }
 
 function getChecklistDataStore() {
-  const mergedStore = Object.assign(
+  return Object.assign(
     {},
+    DEFAULT_CHECKLIST_DATA,
     getAircraftProfileChecklistDataStore(),
     getChecklistEditorDataStore() || {}
   );
-
-  return hasChecklistContent(mergedStore) ? mergedStore : DEFAULT_CHECKLIST_DATA;
 }
 
 function getChecklistAircraftType() {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nordsweet-performance-calculator-v315";
+const CACHE_NAME = "nordsweet-performance-calculator-v318";
 const ASSETS = [
   "./",
   "./index.html",
