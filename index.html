@@ -1515,7 +1515,30 @@ button:hover {
   stroke: #58d27e;
 }
 
+.taxi-chart-vfr-circuit-halo {
+  fill: none;
+  stroke: rgba(5, 5, 5, 0.72);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.taxi-chart-vfr-circuit-line {
+  fill: none;
+  stroke: #ff5f79;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.taxi-chart-vfr-circuit-point {
+  fill: #fffef7;
+  stroke: #ff5f79;
+}
+
 .taxi-chart-map.dark .taxi-chart-route-point {
+  fill: #050505;
+}
+
+.taxi-chart-map.dark .taxi-chart-vfr-circuit-point {
   fill: #050505;
 }
 
@@ -4274,12 +4297,16 @@ button:hover {
 <script src="./aircraft-data.js"></script>
 <script src="./aircraft-data/p2006t-performance.js"></script>
 <script src="./aircraft-data/husk-performance.js"></script>
+<script src="./aircraft-data/fr172h-performance.js"></script>
+<script src="./aircraft-data/r172k-performance.js"></script>
 <script src="./aircraft-data/P2006T%20data.js"></script>
 <script src="./aircraft-data/P2008JC%20data.js"></script>
 <script src="./aircraft-data/P2002JR%20data.js"></script>
 <script src="./aircraft-data/C172%20data.js"></script>
 <script src="./aircraft-data/C152%20data.js"></script>
 <script src="./aircraft-data/HUSK%20data.js"></script>
+<script src="./aircraft-data/FR172H%20data.js"></script>
+<script src="./aircraft-data/R172K%20data.js"></script>
 <script src="./avwx-config.js"></script>
 <script src="./avwx-config.local.js"></script>
 <script src="./atis-feed.js"></script>
@@ -4607,6 +4634,48 @@ const P2006T_CLIMB_VX_WEIGHTS_KG = P2006T_CLIMB_VX
 const P2006T_CRUISE = P2006T_PERFORMANCE && P2006T_PERFORMANCE.cruise
   ? P2006T_PERFORMANCE.cruise
   : null;
+const R172K_PERFORMANCE = window.R172K_PERFORMANCE || null;
+const R172K_TAKEOFF = R172K_PERFORMANCE && R172K_PERFORMANCE.takeoff
+  ? R172K_PERFORMANCE.takeoff
+  : null;
+const R172K_CRUISE = R172K_PERFORMANCE && R172K_PERFORMANCE.cruise
+  ? R172K_PERFORMANCE.cruise
+  : null;
+const R172K_LANDING = R172K_PERFORMANCE && R172K_PERFORMANCE.landing
+  ? R172K_PERFORMANCE.landing
+  : null;
+const R172K_TAKEOFF_WEIGHT_ENTRIES = R172K_TAKEOFF && R172K_TAKEOFF.weightsLb
+  ? Object.keys(R172K_TAKEOFF.weightsLb)
+    .map((weightLb) => ({
+      kg: toNumber(R172K_TAKEOFF.weightsLb[weightLb].weightKg, Number(weightLb) * 0.45359237),
+      lb: Number(weightLb)
+    }))
+    .filter((entry) => Number.isFinite(entry.kg) && Number.isFinite(entry.lb))
+    .sort((left, right) => left.kg - right.kg)
+  : [];
+const R172K_TAKEOFF_WEIGHTS_KG = R172K_TAKEOFF_WEIGHT_ENTRIES.map((entry) => entry.kg);
+const R172K_LANDING_WEIGHT_ENTRIES = R172K_LANDING && R172K_LANDING.weightsLb
+  ? Object.keys(R172K_LANDING.weightsLb)
+    .map((weightLb) => ({
+      kg: toNumber(R172K_LANDING.weightsLb[weightLb].weightKg, Number(weightLb) * 0.45359237),
+      lb: Number(weightLb)
+    }))
+    .sort((left, right) => left.kg - right.kg)
+  : [];
+const R172K_LANDING_WEIGHTS_KG = R172K_LANDING_WEIGHT_ENTRIES.map((entry) => entry.kg);
+const R172K_CLIMB = R172K_PERFORMANCE && R172K_PERFORMANCE.climb
+  ? R172K_PERFORMANCE.climb
+  : null;
+const R172K_CLIMB_WEIGHT_ENTRIES = R172K_CLIMB && R172K_CLIMB.weightsLb
+  ? Object.keys(R172K_CLIMB.weightsLb)
+    .map((weightLb) => ({
+      kg: toNumber(R172K_CLIMB.weightsLb[weightLb].weightKg, Number(weightLb) * 0.45359237),
+      lb: Number(weightLb)
+    }))
+    .filter((entry) => Number.isFinite(entry.kg) && Number.isFinite(entry.lb))
+    .sort((left, right) => left.kg - right.kg)
+  : [];
+const R172K_CLIMB_WEIGHTS_KG = R172K_CLIMB_WEIGHT_ENTRIES.map((entry) => entry.kg);
 const PLANNER_ECONOMY_ALTITUDE_STEP_FT = 500;
 const PLANNER_ECONOMY_MAX_ALTITUDE_FT = 12000;
 const PLANNER_DESCENT_GLIDE_RATIO = 13;
@@ -4621,7 +4690,9 @@ const FALLBACK_AIRCRAFT_PROFILES = [
   { displayName: "Tecnam P2002JR", icaoType: "SIRA", performanceStatus: "pending", powerplant: "reciprocating", type: "P2002JR" },
   { displayName: "Cessna 172", icaoType: "C172", performanceStatus: "pending", powerplant: "reciprocating", type: "C172" },
   { displayName: "Cessna 152", icaoType: "C152", performanceStatus: "pending", powerplant: "reciprocating", type: "C152" },
-  { displayName: "Aviat A-1A Husky", icaoType: "HUSK", performanceStatus: "pending", powerplant: "reciprocating", type: "A-1A Husky" }
+  { displayName: "Aviat A-1A Husky", icaoType: "HUSK", performanceStatus: "pending", powerplant: "reciprocating", type: "A-1A Husky" },
+  { displayName: "Reims-Cessna FR172H Reims Rocket", icaoType: "C172", performanceStatus: "pending", powerplant: "reciprocating", type: "FR172H" },
+  { displayName: "Cessna R172K", icaoType: "C172", performanceStatus: "pending", powerplant: "reciprocating", type: "R172K" }
 ];
 const AIRCRAFT_PROFILE_OPTIONS = AIRCRAFT_DATA && typeof AIRCRAFT_DATA.getDefaultProfiles === "function" && AIRCRAFT_DATA.getDefaultProfiles().length
   ? AIRCRAFT_DATA.getDefaultProfiles()
@@ -4816,7 +4887,8 @@ const DEFAULT_TAXI_OUT_ROUTE_DATA = {
 };
 const TAXI_OUT_ROUTE_DATA = mergeGroundDataSources(
   DEFAULT_TAXI_OUT_ROUTE_DATA,
-  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports
+  window.NORDSWEET_GROUND_DATA && window.NORDSWEET_GROUND_DATA.airports,
+  getWaypointPackageVfrCircuitGroundData()
 );
 const TAXI_CHART_PDF_FRAGMENT = "#toolbar=0&navpanes=0&scrollbar=0&page=1&view=Fit&zoom=page-fit";
 const TAXI_CHART_PDF_DB_NAME = "nordsweet-ground-editor-chart-pdfs";
@@ -5624,10 +5696,66 @@ function mergeGroundDataSources(...sources) {
       if (!airportIcao) {
         return;
       }
-      merged[airportIcao] = Object.assign({}, merged[airportIcao] || {}, cleanSource[icao]);
+      const existing = merged[airportIcao] || {};
+      const incoming = cleanSource[icao] || {};
+      const next = Object.assign({}, existing, incoming);
+      if (existing.chartOverlay || incoming.chartOverlay) {
+        next.chartOverlay = Object.assign({}, existing.chartOverlay || {}, incoming.chartOverlay || {});
+        if (existing.chartOverlay && incoming.chartOverlay && existing.chartOverlay.vfrCircuits && incoming.chartOverlay.vfrCircuits) {
+          next.chartOverlay.vfrCircuits = Object.assign({}, existing.chartOverlay.vfrCircuits || {}, incoming.chartOverlay.vfrCircuits || {});
+        }
+        if (existing.chartOverlay && incoming.chartOverlay && (Array.isArray(existing.chartOverlay.intersections) || Array.isArray(incoming.chartOverlay.intersections))) {
+          const intersections = new Map();
+          (Array.isArray(existing.chartOverlay.intersections) ? existing.chartOverlay.intersections : []).forEach((intersection) => {
+            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
+            if (id) {
+              intersections.set(id, intersection);
+            }
+          });
+          (Array.isArray(incoming.chartOverlay.intersections) ? incoming.chartOverlay.intersections : []).forEach((intersection) => {
+            const id = cleanAtisValue(intersection && intersection.id).toUpperCase();
+            if (id) {
+              intersections.set(id, intersection);
+            }
+          });
+          next.chartOverlay.intersections = Array.from(intersections.values());
+        }
+      }
+      merged[airportIcao] = next;
     });
     return merged;
   }, {});
+}
+
+function getWaypointPackageVfrCircuitGroundData() {
+  const result = {};
+  getPlannerWaypointDataPackages().forEach((dataPackage) => {
+    const packageCircuits = dataPackage && dataPackage.vfrCircuits && typeof dataPackage.vfrCircuits === "object" && !Array.isArray(dataPackage.vfrCircuits)
+      ? dataPackage.vfrCircuits
+      : {};
+    Object.keys(packageCircuits).forEach((airport) => {
+      const airportIcao = cleanAtisValue(airport).toUpperCase();
+      const data = packageCircuits[airport] || {};
+      if (!airportIcao || !data || typeof data !== "object") {
+        return;
+      }
+      const chartOverlay = {
+        chart: clonePlainData(data.chart || {}),
+        intersections: Array.isArray(data.intersections) ? clonePlainData(data.intersections) : [],
+        vfrCircuits: clonePlainData(data.circuits || data.vfrCircuits || {})
+      };
+      if (!result[airportIcao]) {
+        result[airportIcao] = {};
+      }
+      result[airportIcao].chartOverlay = Object.assign({}, result[airportIcao].chartOverlay || {}, chartOverlay);
+      result[airportIcao].chartOverlay.vfrCircuits = Object.assign(
+        {},
+        result[airportIcao].chartOverlay.vfrCircuits || {},
+        chartOverlay.vfrCircuits || {}
+      );
+    });
+  });
+  return result;
 }
 
 function normalizeAirport(rawAirport) {
@@ -6082,13 +6210,27 @@ function normalizePilotWeightKg(value, fallbackValue = 85) {
   return Math.max(0, Math.min(300, weight));
 }
 
+function getWeightBalanceDefaultPilotWeightKg() {
+  const profile = getActiveWeightBalanceProfile();
+  const defaults = profile && profile.defaults && typeof profile.defaults === "object" ? profile.defaults : {};
+  const parsed = toNumber(defaults.pilotWeightKg, NaN);
+  return Number.isFinite(parsed) ? normalizePilotWeightKg(parsed, 85) : NaN;
+}
+
 function getStoredPilotWeightKg() {
+  let rawValue = null;
   try {
-    const rawValue = window.localStorage.getItem(PILOT_WEIGHT_LOCAL_STORAGE_KEY);
-    return rawValue === null ? 85 : normalizePilotWeightKg(rawValue, 85);
+    rawValue = window.localStorage.getItem(PILOT_WEIGHT_LOCAL_STORAGE_KEY);
   } catch (_error) {
-    return 85;
+    rawValue = null;
   }
+
+  if (rawValue !== null) {
+    return normalizePilotWeightKg(rawValue, 85);
+  }
+
+  const profileDefault = getWeightBalanceDefaultPilotWeightKg();
+  return Number.isFinite(profileDefault) ? profileDefault : 85;
 }
 
 function loadPilotWeightPreference() {
@@ -6116,7 +6258,19 @@ function savePilotWeightPreference(value) {
 }
 
 function getWeightBalanceFieldConfig(key) {
-  return WEIGHT_BALANCE_FIELDS.find((field) => field.key === key) || null;
+  const field = WEIGHT_BALANCE_FIELDS.find((item) => item.key === key) || null;
+  if (!field) {
+    return null;
+  }
+
+  if (key === "usableFuelLiters") {
+    const fuelTankCapacityLiters = getFuelTankCapacityLiters();
+    if (Number.isFinite(fuelTankCapacityLiters) && fuelTankCapacityLiters > 0) {
+      return { ...field, max: fuelTankCapacityLiters };
+    }
+  }
+
+  return field;
 }
 
 function normalizeWeightBalanceFieldValue(key, value) {
@@ -6193,6 +6347,23 @@ function normalizeFuelPlanningFuelValue(value) {
   return String(ceilFuelLiters(parsed));
 }
 
+function normalizeFuelPlanningFuelValueForRow(row, value) {
+  const normalized = normalizeFuelPlanningFuelValue(value);
+  if (normalized === "") {
+    return "";
+  }
+
+  if (row && row.key === "fuelOnBoard") {
+    const fuelTankCapacityLiters = getFuelTankCapacityLiters();
+    const parsed = toNumber(normalized, NaN);
+    if (Number.isFinite(fuelTankCapacityLiters) && fuelTankCapacityLiters > 0 && Number.isFinite(parsed)) {
+      return String(Math.min(parsed, Math.ceil(fuelTankCapacityLiters)));
+    }
+  }
+
+  return normalized;
+}
+
 function getFuelTankCapacityLiters() {
   const profile = getSelectedAircraftProfile();
   const profileCapacity = toNumber(
@@ -6231,6 +6402,20 @@ function getSelectedAircraftBasicFuelFlowLph() {
 
 function selectedAircraftUsesP2006TPerformanceTables() {
   return normalizeAircraftType(state.selectedAircraftType) === "P2006T";
+}
+
+function getSelectedCruisePerformanceTable() {
+  if (selectedAircraftUsesP2006TPerformanceTables()) {
+    return P2006T_CRUISE;
+  }
+  if (selectedAircraftUsesR172KPerformanceTables()) {
+    return R172K_CRUISE;
+  }
+  return null;
+}
+
+function selectedAircraftHasCruisePerformanceTable() {
+  return Boolean(getSelectedCruisePerformanceTable());
 }
 
 function createEmptyFuelPlanningState() {
@@ -6289,7 +6474,7 @@ function getFuelPlanningFuelValue(row, options = {}) {
     return String(ceilFuelLiters(getFuelPlanningFinalReserveDetails().selectedLiters));
   }
   if (row && row.weightBalanceField) {
-    return normalizeFuelPlanningFuelValue(getWeightBalanceRawValue(row.weightBalanceField));
+    return normalizeFuelPlanningFuelValueForRow(row, getWeightBalanceRawValue(row.weightBalanceField));
   }
   if (!row) {
     return "";
@@ -6329,7 +6514,7 @@ function getFuelPlanningContingencyDetails() {
   const plannedTripFuelLiters = toNumber(getFuelPlanningFuelValue(plannedTripRow), 0);
   const fivePercentTripLiters = ceilFuelLiters(plannedTripFuelLiters * FUEL_CONTINGENCY_TRIP_FRACTION);
   const oatC = refs.temp ? toNumber(refs.temp.value, 15) : 15;
-  const holdPerformance = getP2006TCruisePerformance(
+  const holdPerformance = getSelectedCruisePerformance(
     FUEL_CONTINGENCY_HOLD_ALTITUDE_FT,
     oatC,
     0,
@@ -6390,7 +6575,7 @@ function getFuelPlanningFinalReserveDetails(planOverride = null) {
   const referenceElevationFt = getPerformanceAirportElevation(referenceAirport);
   const holdingAltitudeFt = Math.max(0, referenceElevationFt + FUEL_FINAL_RESERVE_HEIGHT_ABOVE_AERODROME_FT);
   const weatherTemperature = getFuelPlanningWeatherTemperatureAtAltitude(referenceAirport, holdingAltitudeFt);
-  const holdingPerformance = getP2006TCruisePerformance(
+  const holdingPerformance = getSelectedCruisePerformance(
     holdingAltitudeFt,
     weatherTemperature.temperatureC,
     0,
@@ -6507,28 +6692,28 @@ function interpolateCruiseFuelFlowByPower(entries, targetPowerPct) {
   };
 }
 
-function getCruiseFuelFlowAtPowerForTableAltitude(pressureAltitudeFt, oatC, targetPowerPct) {
+function getCruiseFuelFlowAtPowerForTableAltitude(pressureAltitudeFt, oatC, targetPowerPct, cruiseData = P2006T_CRUISE) {
   const isaDeltaC = oatC - getIsaTemperature(pressureAltitudeFt);
   return interpolateCruiseFuelFlowByPower(
-    getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC),
+    getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC, cruiseData),
     targetPowerPct
   );
 }
 
-function getP2006TFuelFlowAtPower(pressureAltitudeFt, oatC, targetPowerPct) {
-  if (!P2006T_CRUISE || !Array.isArray(P2006T_CRUISE.pressureAltitudesFt)) {
+function getCruiseFuelFlowAtPower(cruiseData, pressureAltitudeFt, oatC, targetPowerPct) {
+  if (!cruiseData || !Array.isArray(cruiseData.pressureAltitudesFt)) {
     return null;
   }
 
-  const altitudeBracket = getBracket(P2006T_CRUISE.pressureAltitudesFt, pressureAltitudeFt);
+  const altitudeBracket = getBracket(cruiseData.pressureAltitudesFt, pressureAltitudeFt);
   if (!altitudeBracket) {
     return null;
   }
 
   const lowerTemperatureC = getFuelPlanningTemperatureAtAltitude(oatC, pressureAltitudeFt, altitudeBracket.lower);
   const upperTemperatureC = getFuelPlanningTemperatureAtAltitude(oatC, pressureAltitudeFt, altitudeBracket.upper);
-  const lowerFlow = getCruiseFuelFlowAtPowerForTableAltitude(altitudeBracket.lower, lowerTemperatureC, targetPowerPct);
-  const upperFlow = getCruiseFuelFlowAtPowerForTableAltitude(altitudeBracket.upper, upperTemperatureC, targetPowerPct);
+  const lowerFlow = getCruiseFuelFlowAtPowerForTableAltitude(altitudeBracket.lower, lowerTemperatureC, targetPowerPct, cruiseData);
+  const upperFlow = getCruiseFuelFlowAtPowerForTableAltitude(altitudeBracket.upper, upperTemperatureC, targetPowerPct, cruiseData);
   if (!lowerFlow || !upperFlow) {
     return null;
   }
@@ -6540,6 +6725,18 @@ function getP2006TFuelFlowAtPower(pressureAltitudeFt, oatC, targetPowerPct) {
     pressureAltitudeFt,
     targetPowerPct
   };
+}
+
+function getP2006TFuelFlowAtPower(pressureAltitudeFt, oatC, targetPowerPct) {
+  return getCruiseFuelFlowAtPower(P2006T_CRUISE, pressureAltitudeFt, oatC, targetPowerPct);
+}
+
+function getR172KFuelFlowAtPower(pressureAltitudeFt, oatC, targetPowerPct) {
+  return getCruiseFuelFlowAtPower(R172K_CRUISE, pressureAltitudeFt, oatC, targetPowerPct);
+}
+
+function getSelectedFuelFlowAtPower(pressureAltitudeFt, oatC, targetPowerPct) {
+  return getCruiseFuelFlowAtPower(getSelectedCruisePerformanceTable(), pressureAltitudeFt, oatC, targetPowerPct);
 }
 
 function getFuelPlanningClimbSuggestion() {
@@ -6555,16 +6752,18 @@ function getFuelPlanningClimbSuggestion() {
   const qnh = refs.qnh ? numberFromInput(refs.qnh, 1013) : 1013;
   const temperatureC = refs.temp ? numberFromInput(refs.temp, 15) : 15;
   const weights = getWeightBalancePerformanceWeights();
-  const climbData = P2006T_CLIMB_FLAPS_UP_VY || P2006T_CLIMB;
-  const climbWeights = P2006T_CLIMB_FLAPS_UP_VY ? P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG : P2006T_CLIMB_WEIGHTS_KG;
   const departurePressureAltitudeFt = getPressureAltitude(airportElevationFt, qnh);
-  const climbPerformance = getP2006TClimbPerformance(
-    weights.takeoffWeightKg,
-    departurePressureAltitudeFt,
-    temperatureC,
-    climbData,
-    climbWeights
-  );
+  const climbPerformance = selectedAircraftUsesR172KPerformanceTables()
+    ? getR172KClimbPerformance(weights.takeoffWeightKg, departurePressureAltitudeFt, temperatureC)
+    : selectedAircraftUsesP2006TPerformanceTables()
+      ? getP2006TClimbPerformance(
+        weights.takeoffWeightKg,
+        departurePressureAltitudeFt,
+        temperatureC,
+        P2006T_CLIMB_FLAPS_UP_VY || P2006T_CLIMB,
+        P2006T_CLIMB_FLAPS_UP_VY ? P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG : P2006T_CLIMB_WEIGHTS_KG
+      )
+      : null;
   const rateOfClimbFpm = climbPerformance && Number.isFinite(climbPerformance.rateOfClimbFpm)
     ? climbPerformance.rateOfClimbFpm * PLANNING_BEST_RATE_CLIMB_FACTOR
     : NaN;
@@ -6576,7 +6775,7 @@ function getFuelPlanningClimbSuggestion() {
   const averageAltitudeFt = airportElevationFt + altitudeGainFt / 2;
   const averagePressureAltitudeFt = getPressureAltitude(averageAltitudeFt, qnh);
   const averageTemperatureC = getFuelPlanningTemperatureAtAltitude(temperatureC, airportElevationFt, averageAltitudeFt);
-  const fuelFlow = getP2006TFuelFlowAtPower(
+  const fuelFlow = getSelectedFuelFlowAtPower(
     averagePressureAltitudeFt,
     averageTemperatureC,
     FUEL_CLIMB_POWER_TARGET_PCT
@@ -6618,7 +6817,7 @@ function getPlannerCruiseSpeedKt() {
 }
 
 function getPlannerEcoCruisePerformance() {
-  if (!selectedAircraftUsesP2006TPerformanceTables()) {
+  if (!selectedAircraftHasCruisePerformanceTable()) {
     return null;
   }
 
@@ -6639,7 +6838,7 @@ function getPlannerEcoCruisePerformance() {
     };
   }
 
-  return getP2006TCruisePerformance(
+  return getSelectedCruisePerformance(
     cruiseAltitudeContext.altitudeFt,
     getCruiseOatCFromState(),
     getCruiseWindComponentKtFromState(),
@@ -6682,7 +6881,7 @@ function getPlannerRouteCruiseEconomy(plan, mode = "eco-distance") {
     const windComponentKt = legWind && Number.isFinite(legWind.windComponentKt)
       ? legWind.windComponentKt
       : manualWindComponentKt;
-    const performance = getP2006TCruisePerformance(
+    const performance = getSelectedCruisePerformance(
       legAltitudeFt,
       oatC,
       windComponentKt,
@@ -6737,8 +6936,9 @@ function getPlannerRouteCruiseEconomy(plan, mode = "eco-distance") {
 }
 
 function getPlannerEconomyAltitudeCandidates() {
-  const tableAltitudes = P2006T_CRUISE && Array.isArray(P2006T_CRUISE.pressureAltitudesFt)
-    ? P2006T_CRUISE.pressureAltitudesFt
+  const cruiseData = getSelectedCruisePerformanceTable();
+  const tableAltitudes = cruiseData && Array.isArray(cruiseData.pressureAltitudesFt)
+    ? cruiseData.pressureAltitudesFt
         .map((value) => Number(value))
         .filter((value) => Number.isFinite(value))
     : [0, PLANNER_ECONOMY_MAX_ALTITUDE_FT];
@@ -6812,7 +7012,7 @@ function evaluatePlannerEconomyLeg(leg, fromAltitudeFt, toAltitudeFt, oatC, rout
 
   const legAltitudeFt = Math.round((fromAltitudeFt + toAltitudeFt) / 2);
   const windData = getPlannerLegWindDataForAltitudes(leg, fromAltitudeFt, toAltitudeFt, routeWindContext);
-  const performance = getP2006TCruisePerformance(
+  const performance = getSelectedCruisePerformance(
     legAltitudeFt,
     oatC,
     windData.windComponentKt,
@@ -6862,7 +7062,7 @@ function buildPlannerEconomySuggestions() {
   if (!plan || plan.error) {
     return { error: plan && plan.error ? plan.error : "Build a route first." };
   }
-  if (!P2006T_CRUISE) {
+  if (!selectedAircraftHasCruisePerformanceTable()) {
     return { error: "No cruise performance table is available for the selected aircraft yet." };
   }
   if (!Array.isArray(plan.points) || plan.points.length < 2 || !Array.isArray(plan.legs) || !plan.legs.length) {
@@ -7048,15 +7248,13 @@ function getFuelPlanningCruisePerformanceForPlanner() {
   const cruiseOatC = getCruiseOatCFromState();
   const windComponentKt = plan ? getPlannerRouteWindComponentKt(plan) : getCruiseWindComponentKtFromState();
   const plannerCruiseSpeedKt = getPlannerCruiseSpeedKt();
-  const cruisePerformance = selectedAircraftUsesP2006TPerformanceTables()
-    ? getP2006TCruisePerformance(
-        cruiseAltitudeFt,
-        cruiseOatC,
-        windComponentKt,
-        getCruiseOptimizationMode(),
-        getCruiseManualTarget()
-      )
-    : null;
+  const cruisePerformance = getSelectedCruisePerformance(
+    cruiseAltitudeFt,
+    cruiseOatC,
+    windComponentKt,
+    getCruiseOptimizationMode(),
+    getCruiseManualTarget()
+  );
   const basicFuelFlowLph = getSelectedAircraftBasicFuelFlowLph();
 
   const performanceGroundSpeedKt = cruisePerformance && Number.isFinite(cruisePerformance.groundSpeedKt)
@@ -7095,7 +7293,7 @@ function getFuelPlanningPlannedTripSuggestion() {
   }
 
   const cruiseContext = getFuelPlanningCruisePerformanceForPlanner();
-  const routeEconomy = selectedAircraftUsesP2006TPerformanceTables()
+  const routeEconomy = selectedAircraftHasCruisePerformanceTable()
     ? getPlannerRouteCruiseEconomy(plan, getCruiseOptimizationMode() === "manual" ? "manual" : "eco-distance")
     : null;
   const routeDistanceNm = Math.max(0, toNumber(plan.totalDistanceNm, 0));
@@ -7237,16 +7435,18 @@ function getFuelPlanningAlternateClimbDetails(plan, cruiseAltitudeFt) {
   const qnh = refs.qnh ? numberFromInput(refs.qnh, 1013) : 1013;
   const temperatureC = refs.temp ? numberFromInput(refs.temp, 15) : 15;
   const weights = getWeightBalancePerformanceWeights();
-  const climbData = P2006T_CLIMB_FLAPS_UP_VY || P2006T_CLIMB;
-  const climbWeights = P2006T_CLIMB_FLAPS_UP_VY ? P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG : P2006T_CLIMB_WEIGHTS_KG;
   const destinationPressureAltitudeFt = getPressureAltitude(destinationElevationFt, qnh);
-  const climbPerformance = getP2006TClimbPerformance(
-    weights.landingWeightKg,
-    destinationPressureAltitudeFt,
-    temperatureC,
-    climbData,
-    climbWeights
-  );
+  const climbPerformance = selectedAircraftUsesR172KPerformanceTables()
+    ? getR172KClimbPerformance(weights.landingWeightKg, destinationPressureAltitudeFt, temperatureC)
+    : selectedAircraftUsesP2006TPerformanceTables()
+      ? getP2006TClimbPerformance(
+        weights.landingWeightKg,
+        destinationPressureAltitudeFt,
+        temperatureC,
+        P2006T_CLIMB_FLAPS_UP_VY || P2006T_CLIMB,
+        P2006T_CLIMB_FLAPS_UP_VY ? P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG : P2006T_CLIMB_WEIGHTS_KG
+      )
+      : null;
   const tableRateOfClimbFpm = climbPerformance && Number.isFinite(climbPerformance.rateOfClimbFpm)
     ? climbPerformance.rateOfClimbFpm
     : NaN;
@@ -7259,7 +7459,7 @@ function getFuelPlanningAlternateClimbDetails(plan, cruiseAltitudeFt) {
   const averageAltitudeFt = destinationElevationFt + altitudeGainFt / 2;
   const averagePressureAltitudeFt = getPressureAltitude(averageAltitudeFt, qnh);
   const averageTemperatureC = getFuelPlanningTemperatureAtAltitude(temperatureC, destinationElevationFt, averageAltitudeFt);
-  const climbFuelFlow = getP2006TFuelFlowAtPower(
+  const climbFuelFlow = getSelectedFuelFlowAtPower(
     averagePressureAltitudeFt,
     averageTemperatureC,
     FUEL_ALTERNATE_MISSED_APPROACH_POWER_TARGET_PCT
@@ -7400,7 +7600,76 @@ function updateLinkedWeightBalanceFuelField(row, value) {
   saveWeightBalancePreferences();
 }
 
+function getActiveWeightBalanceProfile() {
+  const profile = getSelectedAircraftProfile();
+  return profile && profile.weightBalance && typeof profile.weightBalance === "object"
+    ? profile.weightBalance
+    : null;
+}
+
+function getActiveWeightBalanceArms() {
+  const profile = getActiveWeightBalanceProfile();
+  const profileArms = profile && profile.armsM && typeof profile.armsM === "object" ? profile.armsM : {};
+  return Object.keys(WEIGHT_BALANCE_ARMS_M).reduce((arms, key) => {
+    const profileArm = toNumber(profileArms[key], NaN);
+    arms[key] = Number.isFinite(profileArm) ? profileArm : WEIGHT_BALANCE_ARMS_M[key];
+    return arms;
+  }, {});
+}
+
+function getActiveWeightBalanceMtowKg() {
+  const profile = getActiveWeightBalanceProfile();
+  const profileMtow = toNumber(
+    profile && (
+      profile.mtowKg ||
+      profile.maxTakeoffWeightKg ||
+      profile.maximumTakeoffWeightKg
+    ),
+    NaN
+  );
+  return Number.isFinite(profileMtow) && profileMtow > 0 ? profileMtow : WEIGHT_BALANCE_MTOW_KG;
+}
+
+function getActiveWeightBalanceFuelDensityKgPerL() {
+  const profile = getActiveWeightBalanceProfile();
+  const profileDensity = toNumber(profile && profile.fuelDensityKgPerL, NaN);
+  return Number.isFinite(profileDensity) && profileDensity > 0
+    ? profileDensity
+    : WEIGHT_BALANCE_FUEL_DENSITY_KG_PER_L;
+}
+
+function getActiveWeightBalanceEnvelope() {
+  const profile = getActiveWeightBalanceProfile();
+  const profileEnvelope = profile && profile.envelope && typeof profile.envelope === "object"
+    ? profile.envelope
+    : null;
+  const points = profileEnvelope && Array.isArray(profileEnvelope.points)
+    ? profileEnvelope.points.filter((point) => Number.isFinite(toNumber(point.weightKg, NaN)) && Number.isFinite(toNumber(point.momentKgm, NaN)))
+    : [];
+  if (points.length >= 3) {
+    return {
+      maxMomentKgm: toNumber(profileEnvelope.maxMomentKgm, Math.max(...points.map((point) => point.momentKgm))),
+      maxWeightKg: toNumber(profileEnvelope.maxWeightKg, Math.max(...points.map((point) => point.weightKg))),
+      minMomentKgm: toNumber(profileEnvelope.minMomentKgm, Math.min(...points.map((point) => point.momentKgm))),
+      minWeightKg: toNumber(profileEnvelope.minWeightKg, Math.min(...points.map((point) => point.weightKg))),
+      points: points.map((point) => ({
+        momentKgm: toNumber(point.momentKgm, 0),
+        weightKg: toNumber(point.weightKg, 0)
+      }))
+    };
+  }
+
+  return WEIGHT_BALANCE_ENVELOPE;
+}
+
 function getWeightBalanceDefaultValue(key) {
+  const profile = getActiveWeightBalanceProfile();
+  const profileDefaults = profile && profile.defaults && typeof profile.defaults === "object" ? profile.defaults : {};
+  const profileValue = profileDefaults[key];
+  if (cleanAtisValue(profileValue) !== "") {
+    return cleanAtisValue(profileValue);
+  }
+
   const defaults = WEIGHT_BALANCE_DEFAULTS_BY_AIRCRAFT[state.selectedAircraftType] || {};
   return cleanAtisValue(defaults[key] || "");
 }
@@ -7412,7 +7681,7 @@ function getWeightBalanceRawValue(key, options = {}) {
   }
   const storedValue = state.weightBalance && cleanAtisValue(state.weightBalance[key]);
   if (storedValue !== "") {
-    return storedValue;
+    return normalizeWeightBalanceFieldValue(key, storedValue);
   }
   return getWeightBalanceDefaultValue(key);
 }
@@ -7432,7 +7701,7 @@ function getWeightBalanceMoment(weightKg, armM) {
 }
 
 function getFuelWeightFromLiters(liters) {
-  return Math.max(0, toNumber(liters, 0)) * WEIGHT_BALANCE_FUEL_DENSITY_KG_PER_L;
+  return Math.max(0, toNumber(liters, 0)) * getActiveWeightBalanceFuelDensityKgPerL();
 }
 
 function getWeightBalanceRows(options = {}) {
@@ -7440,6 +7709,8 @@ function getWeightBalanceRows(options = {}) {
   const fieldOptions = {
     suppressFuelSuggestions: Boolean(settings.suppressFuelSuggestions)
   };
+  const arms = getActiveWeightBalanceArms();
+  const mtowWeightKg = getActiveWeightBalanceMtowKg();
   const emptyWeightKg = getWeightBalanceOptionalNumber("emptyWeightKg", fieldOptions);
   const emptyArmM = getWeightBalanceOptionalNumber("emptyArmM", fieldOptions);
   const usableFuelLiters = getWeightBalanceFieldNumber("usableFuelLiters", fieldOptions);
@@ -7457,17 +7728,17 @@ function getWeightBalanceRows(options = {}) {
   const baggageWeightKg = getWeightBalanceFieldNumber("baggageWeightKg", fieldOptions);
   const rows = [
     { armM: emptyArmM, key: "empty", label: "Empty weight", momentKgm: getWeightBalanceMoment(emptyWeightKg, emptyArmM), weightKg: emptyWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.pilot, key: "pilot", label: "Pilot", momentKgm: getWeightBalanceMoment(state.pilotWeightKg, WEIGHT_BALANCE_ARMS_M.pilot), weightKg: state.pilotWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.coPilot, key: "coPilot", label: "Co-Pilot", momentKgm: getWeightBalanceMoment(coPilotWeightKg, WEIGHT_BALANCE_ARMS_M.coPilot), weightKg: coPilotWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.firstPassenger, key: "firstPassenger", label: "1st Passenger", momentKgm: getWeightBalanceMoment(firstPassengerWeightKg, WEIGHT_BALANCE_ARMS_M.firstPassenger), weightKg: firstPassengerWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.secondPassenger, key: "secondPassenger", label: "2nd Passenger", momentKgm: getWeightBalanceMoment(secondPassengerWeightKg, WEIGHT_BALANCE_ARMS_M.secondPassenger), weightKg: secondPassengerWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.baggage, key: "baggage", label: "Baggage", momentKgm: getWeightBalanceMoment(baggageWeightKg, WEIGHT_BALANCE_ARMS_M.baggage), weightKg: baggageWeightKg },
-    { armM: WEIGHT_BALANCE_ARMS_M.fuel, key: "usableFuel", label: "Usable fuel", momentKgm: getWeightBalanceMoment(usableFuelWeightKg, WEIGHT_BALANCE_ARMS_M.fuel), weightKg: usableFuelWeightKg }
+    { armM: arms.pilot, key: "pilot", label: "Pilot", momentKgm: getWeightBalanceMoment(state.pilotWeightKg, arms.pilot), weightKg: state.pilotWeightKg },
+    { armM: arms.coPilot, key: "coPilot", label: "Co-Pilot", momentKgm: getWeightBalanceMoment(coPilotWeightKg, arms.coPilot), weightKg: coPilotWeightKg },
+    { armM: arms.firstPassenger, key: "firstPassenger", label: "1st Passenger", momentKgm: getWeightBalanceMoment(firstPassengerWeightKg, arms.firstPassenger), weightKg: firstPassengerWeightKg },
+    { armM: arms.secondPassenger, key: "secondPassenger", label: "2nd Passenger", momentKgm: getWeightBalanceMoment(secondPassengerWeightKg, arms.secondPassenger), weightKg: secondPassengerWeightKg },
+    { armM: arms.baggage, key: "baggage", label: "Baggage", momentKgm: getWeightBalanceMoment(baggageWeightKg, arms.baggage), weightKg: baggageWeightKg },
+    { armM: arms.fuel, key: "usableFuel", label: "Usable fuel", momentKgm: getWeightBalanceMoment(usableFuelWeightKg, arms.fuel), weightKg: usableFuelWeightKg }
   ];
   const loadedWeightKg = rows.reduce((sum, row) => sum + (Number.isFinite(row.weightKg) ? row.weightKg : 0), 0);
   const loadedMomentKgm = rows.reduce((sum, row) => sum + (Number.isFinite(row.momentKgm) ? row.momentKgm : 0), 0);
-  const fuelRequiredMomentKgm = getWeightBalanceMoment(fuelRequiredWeightKg, WEIGHT_BALANCE_ARMS_M.fuel);
-  const alternateFuelMomentKgm = getWeightBalanceMoment(alternateFuelWeightKg, WEIGHT_BALANCE_ARMS_M.fuel);
+  const fuelRequiredMomentKgm = getWeightBalanceMoment(fuelRequiredWeightKg, arms.fuel);
+  const alternateFuelMomentKgm = getWeightBalanceMoment(alternateFuelWeightKg, arms.fuel);
   const landingMomentKgm = loadedMomentKgm - fuelRequiredMomentKgm;
   const landingWeightKg = loadedWeightKg - fuelRequiredWeightKg;
 
@@ -7477,13 +7748,14 @@ function getWeightBalanceRows(options = {}) {
     alternateFuelWeightKg,
     alternateLandingMomentKgm: landingMomentKgm - alternateFuelMomentKgm,
     alternateLandingWeightKg: landingWeightKg - alternateFuelWeightKg,
+    arms,
     fuelRequiredMomentKgm,
     fuelRequiredLiters,
     fuelRequiredWeightKg,
     loadedMomentKgm,
     loadedWeightKg,
-    mlwWeightKg: Math.max(0, WEIGHT_BALANCE_MTOW_KG - fuelRequiredWeightKg),
-    mtowWeightKg: WEIGHT_BALANCE_MTOW_KG,
+    mlwWeightKg: Math.max(0, mtowWeightKg - fuelRequiredWeightKg),
+    mtowWeightKg,
     rows,
     usableFuelLiters,
     usableFuelWeightKg,
@@ -7559,41 +7831,58 @@ function pointInPolygon(point, polygon) {
   return isInside;
 }
 
-function renderWeightBalanceChart(weightKg, momentKgm, mlwWeightKg = WEIGHT_BALANCE_MTOW_KG, landingWeightKg = NaN, landingMomentKgm = NaN, alternateLandingWeightKg = NaN, alternateLandingMomentKgm = NaN) {
+function getWeightBalanceGridStep(range, targetLines = 7) {
+  const rawStep = Math.max(1, Math.abs(range) / Math.max(1, targetLines));
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const normalized = rawStep / magnitude;
+  const nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return nice * magnitude;
+}
+
+function getWeightBalanceGridValues(minValue, maxValue, targetLines = 7) {
+  const min = toNumber(minValue, 0);
+  const max = toNumber(maxValue, min + 1);
+  const step = getWeightBalanceGridStep(max - min, targetLines);
+  const start = Math.ceil(min / step) * step;
+  const values = [];
+  for (let value = start; value <= max + step * 0.01; value += step) {
+    values.push(Math.round(value * 1000) / 1000);
+  }
+  return values;
+}
+
+function renderWeightBalanceChart(weightKg, momentKgm, mlwWeightKg = getActiveWeightBalanceMtowKg(), landingWeightKg = NaN, landingMomentKgm = NaN, alternateLandingWeightKg = NaN, alternateLandingMomentKgm = NaN) {
   const width = 720;
   const height = 420;
   const margin = { bottom: 45, left: 58, right: 24, top: 26 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
-  const envelope = WEIGHT_BALANCE_ENVELOPE;
+  const envelope = getActiveWeightBalanceEnvelope();
+  const mtowKg = getActiveWeightBalanceMtowKg();
   const mapX = (moment) => margin.left + ((moment - envelope.minMomentKgm) / (envelope.maxMomentKgm - envelope.minMomentKgm)) * plotWidth;
   const mapY = (weight) => margin.top + plotHeight - ((weight - envelope.minWeightKg) / (envelope.maxWeightKg - envelope.minWeightKg)) * plotHeight;
   const gridLines = [];
 
-  for (let moment = 175; moment <= 550; moment += 25) {
+  getWeightBalanceGridValues(envelope.minMomentKgm, envelope.maxMomentKgm, 8).forEach((moment) => {
     const x = mapX(moment);
     gridLines.push('<line x1="' + x + '" y1="' + margin.top + '" x2="' + x + '" y2="' + (margin.top + plotHeight) + '" stroke="#e1e8f2" stroke-width="1"/>');
-    if (moment % 50 === 0) {
-      gridLines.push('<text x="' + x + '" y="' + (height - 16) + '" text-anchor="middle" font-size="10" fill="#526273">' + moment + "</text>");
-    }
-  }
+    gridLines.push('<text x="' + x + '" y="' + (height - 16) + '" text-anchor="middle" font-size="10" fill="#526273">' + escapeHtml(formatWeightBalanceNumber(moment, 0)) + "</text>");
+  });
 
-  for (let weight = 800; weight <= 1300; weight += 50) {
+  getWeightBalanceGridValues(envelope.minWeightKg, envelope.maxWeightKg, 7).forEach((weight) => {
     const y = mapY(weight);
     gridLines.push('<line x1="' + margin.left + '" y1="' + y + '" x2="' + (margin.left + plotWidth) + '" y2="' + y + '" stroke="#e7edf5" stroke-width="1"/>');
-    if (weight % 100 === 0) {
-      gridLines.push('<text x="' + (margin.left - 10) + '" y="' + (y + 3) + '" text-anchor="end" font-size="10" fill="#526273">' + weight + "</text>");
-    }
-  }
+    gridLines.push('<text x="' + (margin.left - 10) + '" y="' + (y + 3) + '" text-anchor="end" font-size="10" fill="#526273">' + escapeHtml(formatWeightBalanceNumber(weight, 0)) + "</text>");
+  });
 
   const envelopePoints = envelope.points
     .map((point) => mapX(point.momentKgm) + "," + mapY(point.weightKg))
     .join(" ");
-  const mtowY = mapY(WEIGHT_BALANCE_MTOW_KG);
+  const mtowY = mapY(mtowKg);
   const mtowLineSvg = [
     '<g aria-label="MTOW limit">',
     '<line x1="' + margin.left + '" y1="' + mtowY + '" x2="' + (margin.left + plotWidth) + '" y2="' + mtowY + '" stroke="#d92d45" stroke-width="1.8" stroke-dasharray="8 6"/>',
-    '<text x="' + (margin.left + plotWidth - 8) + '" y="' + (mtowY - 7) + '" text-anchor="end" font-size="11" font-weight="900" fill="#d92d45">MTOW ' + escapeHtml(formatWeightBalanceNumber(WEIGHT_BALANCE_MTOW_KG, 0)) + ' kg</text>',
+    '<text x="' + (margin.left + plotWidth - 8) + '" y="' + (mtowY - 7) + '" text-anchor="end" font-size="11" font-weight="900" fill="#d92d45">MTOW ' + escapeHtml(formatWeightBalanceNumber(mtowKg, 0)) + ' kg</text>',
     "</g>"
   ].join("");
   const hasPoint = Number.isFinite(weightKg) && Number.isFinite(momentKgm) && weightKg > 0;
@@ -7651,10 +7940,12 @@ function renderWeightBalanceCard(label, value) {
 function renderWeightBalanceContentHtml() {
   const activePhase = PERFORMANCE_PHASES.find((phase) => phase.key === getActivePerformancePhaseKey());
   const calculation = getWeightBalanceRows();
+  const envelope = getActiveWeightBalanceEnvelope();
   const insideEnvelope = pointInPolygon(
     { momentKgm: calculation.loadedMomentKgm, weightKg: calculation.loadedWeightKg },
-    WEIGHT_BALANCE_ENVELOPE.points
+    envelope.points
   );
+  const arms = calculation.arms || getActiveWeightBalanceArms();
   const hasEmptyData = Number.isFinite(getWeightBalanceOptionalNumber("emptyWeightKg")) && Number.isFinite(getWeightBalanceOptionalNumber("emptyArmM"));
   const statusTone = !hasEmptyData ? "warn" : insideEnvelope ? "ok" : "error";
   const statusText = hasEmptyData
@@ -7673,51 +7964,51 @@ function renderWeightBalanceContentHtml() {
     renderWeightBalanceTableRow(
       { label: "Pilot" },
       '<input type="number" aria-label="Pilot weight kg" data-wb-pilot-weight min="0" max="300" step="1" value="' + escapeHtml(state.pilotWeightKg) + '">',
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.pilot, 3),
+      formatWeightBalanceNumber(arms.pilot, 3),
       calculation.rows[1].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Co-Pilot" },
       renderWeightBalanceInput("coPilotWeightKg", "Co-pilot weight kg"),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.coPilot, 3),
+      formatWeightBalanceNumber(arms.coPilot, 3),
       calculation.rows[2].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "1st Passenger" },
       renderWeightBalanceInput("firstPassengerWeightKg", "First passenger weight kg"),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.firstPassenger, 3),
+      formatWeightBalanceNumber(arms.firstPassenger, 3),
       calculation.rows[3].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "2nd Passenger" },
       renderWeightBalanceInput("secondPassengerWeightKg", "Second passenger weight kg"),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.secondPassenger, 3),
+      formatWeightBalanceNumber(arms.secondPassenger, 3),
       calculation.rows[4].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Baggage" },
       renderWeightBalanceInput("baggageWeightKg", "Baggage weight kg"),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.baggage, 3),
+      formatWeightBalanceNumber(arms.baggage, 3),
       calculation.rows[5].momentKgm
     ),
     renderWeightBalanceTableRow(
       { label: "Usable fuel [L]" },
       renderWeightBalanceFuelInput("usableFuelLiters", "Usable fuel liters", calculation.usableFuelLiters, calculation.usableFuelWeightKg),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
+      formatWeightBalanceNumber(arms.fuel, 3),
       calculation.rows[6].momentKgm
     ),
     '<tr class="wb-total-row"><td>Current condition W = Sum W</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.loadedWeightKg, 1)) + '</td><td>M = Sum M</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.loadedMomentKgm, 1)) + "</td></tr>",
     renderWeightBalanceTableRow(
       { label: "Trip fuel [L]" },
       renderWeightBalanceFuelInput("fuelRequiredLiters", "Trip fuel liters", calculation.fuelRequiredLiters, calculation.fuelRequiredWeightKg),
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
+      formatWeightBalanceNumber(arms.fuel, 3),
       calculation.fuelRequiredMomentKgm
     ),
     '<tr class="wb-total-row"><td>Landing condition W = W - fuel</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.landingWeightKg, 1)) + '</td><td>M = M - fuel moment</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.landingMomentKgm, 1)) + "</td></tr>",
     renderWeightBalanceTableRow(
       { label: "Alternate fuel [L]" },
       '<span>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateFuelLiters, 0)) + " L = " + escapeHtml(formatWeightBalanceNumber(calculation.alternateFuelWeightKg, 1)) + " kg</span>",
-      formatWeightBalanceNumber(WEIGHT_BALANCE_ARMS_M.fuel, 3),
+      formatWeightBalanceNumber(arms.fuel, 3),
       calculation.alternateFuelMomentKgm
     ),
     '<tr class="wb-total-row"><td>ALW = LW - alternate fuel</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateLandingWeightKg, 1)) + '</td><td>M = LW moment - alternate fuel moment</td><td>' + escapeHtml(formatWeightBalanceNumber(calculation.alternateLandingMomentKgm, 1)) + "</td></tr>"
@@ -8735,14 +9026,32 @@ function formatCruisePerformance(cruisePerformance) {
     return "n/a";
   }
 
+  const fuelSuffix = Number.isFinite(cruisePerformance.engineCount) && cruisePerformance.engineCount > 1
+    ? " l/h total"
+    : " l/h";
   return (
     roundTo(cruisePerformance.pwrPct, 1) +
     "% PWR / " +
     roundTo(cruisePerformance.ktas, 1) +
     " KTAS / " +
     roundTo(cruisePerformance.fuelTotalLph, 1) +
-    " l/h (2 eng)"
+    fuelSuffix
   );
+}
+
+function formatCruiseWeightBasis(cruiseData) {
+  if (!cruiseData) {
+    return "n/a";
+  }
+
+  const labels = [];
+  if (Number.isFinite(cruiseData.weightKg)) {
+    labels.push(roundTo(cruiseData.weightKg, 1) + " kg");
+  }
+  if (Number.isFinite(cruiseData.weightLb)) {
+    labels.push(Math.round(cruiseData.weightLb) + " lb");
+  }
+  return labels.length ? labels.join(" / ") + " table" : "n/a";
 }
 
 function formatCruiseSetting(cruisePerformance) {
@@ -14296,6 +14605,721 @@ function interpolateSettingByWeight(settingKey, weightKg) {
   return lerp(lowerValue, upperValue, weightBracket.ratio);
 }
 
+function selectedAircraftUsesR172KPerformanceTables() {
+  return normalizeAircraftType(state.selectedAircraftType) === "R172K";
+}
+
+function getR172KTakeoffEntryForKg(weightKg) {
+  return R172K_TAKEOFF_WEIGHT_ENTRIES.find((entry) => Math.abs(entry.kg - weightKg) < 0.001) || null;
+}
+
+function getR172KTakeoffWeightTable(weightKg) {
+  const entry = getR172KTakeoffEntryForKg(weightKg);
+  return entry && R172K_TAKEOFF && R172K_TAKEOFF.weightsLb
+    ? R172K_TAKEOFF.weightsLb[String(entry.lb)] || null
+    : null;
+}
+
+function getR172KTakeoffTemperaturePoints(weightTable, metricKey, altitudeIndex) {
+  if (!weightTable || !weightTable.distanceM || !Array.isArray(weightTable.temperaturesC)) {
+    return [];
+  }
+
+  const row = weightTable.distanceM[metricKey] && weightTable.distanceM[metricKey][altitudeIndex];
+  if (!Array.isArray(row)) {
+    return [];
+  }
+
+  return weightTable.temperaturesC
+    .map((tempC, index) => ({
+      id: "col-" + index,
+      label: tempC + " C",
+      tempC,
+      valueM: row[index]
+    }))
+    .filter((point) => Number.isFinite(point.tempC) && Number.isFinite(point.valueM))
+    .sort((left, right) => left.tempC - right.tempC);
+}
+
+function interpolateR172KTakeoffMetricForTable(weightTable, metricKey, pressureAltitudeFt, temperatureC) {
+  if (!weightTable || !Array.isArray(weightTable.pressureAltitudesFt)) {
+    return null;
+  }
+
+  const altitudeBracket = getBracket(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeBracket) {
+    return null;
+  }
+
+  const lowerIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.lower);
+  const upperIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.upper);
+  const lowerValue = interpolatePointsByTemperature(
+    getR172KTakeoffTemperaturePoints(weightTable, metricKey, lowerIndex),
+    temperatureC
+  );
+  const upperValue = interpolatePointsByTemperature(
+    getR172KTakeoffTemperaturePoints(weightTable, metricKey, upperIndex),
+    temperatureC
+  );
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, altitudeBracket.ratio);
+}
+
+function interpolateR172KTakeoffSettingByWeight(settingKey, weightKg) {
+  if (!R172K_TAKEOFF_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightBracket = getBracket(R172K_TAKEOFF_WEIGHTS_KG, weightKg);
+  if (!weightBracket) {
+    return null;
+  }
+
+  const lowerTable = getR172KTakeoffWeightTable(weightBracket.lower);
+  const upperTable = getR172KTakeoffWeightTable(weightBracket.upper);
+  const lowerValue = lowerTable ? lowerTable[settingKey] : null;
+  const upperValue = upperTable ? upperTable[settingKey] : null;
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, weightBracket.ratio);
+}
+
+function applyR172KTakeoffCorrections(baseGroundRollM, baseObstacle50ftM, runway, wind) {
+  const corrections = [];
+  const headwindKt = wind && wind.headwind > 0 ? wind.headwind : 0;
+  const tailwindKt = wind && wind.headwind < 0 ? Math.abs(wind.headwind) : 0;
+  const correctionRules = R172K_TAKEOFF && R172K_TAKEOFF.corrections ? R172K_TAKEOFF.corrections : {};
+  let correctedGroundRollM = baseGroundRollM;
+  let correctedObstacle50ftM = baseObstacle50ftM;
+
+  if (headwindKt > 0) {
+    const factor = Math.max(0, 1 - headwindKt * toNumber(correctionRules.headwindDecreasePercentPerKt, 10 / 9) / 100);
+    correctedGroundRollM *= factor;
+    correctedObstacle50ftM *= factor;
+    corrections.push(Math.round(headwindKt) + " kt headwind");
+  } else if (tailwindKt > 0) {
+    const limitedTailwindKt = Math.min(tailwindKt, toNumber(correctionRules.tailwindLimitKt, 10));
+    const factor = 1 + limitedTailwindKt * toNumber(correctionRules.tailwindIncreasePercentPerKt, 5) / 100;
+    correctedGroundRollM *= factor;
+    correctedObstacle50ftM *= factor;
+    corrections.push(Math.round(tailwindKt) + " kt tailwind");
+  }
+
+  const runwaySurface = runway ? String(runway.surface || "").toLowerCase() : "";
+  if (["grass", "turf"].includes(runwaySurface)) {
+    const grassAdditionM = baseGroundRollM * toNumber(correctionRules.dryGrassIncreaseByGroundRollPercent, 15) / 100;
+    correctedGroundRollM += grassAdditionM;
+    correctedObstacle50ftM += grassAdditionM;
+    corrections.push("dry grass");
+  }
+
+  return {
+    correctedGroundRollM: Math.max(0, correctedGroundRollM),
+    correctedObstacle50ftM: Math.max(0, correctedObstacle50ftM),
+    corrections,
+    headwindKt,
+    runwaySurface,
+    tailwindKt
+  };
+}
+
+function getR172KTakeoffConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  if (!R172K_TAKEOFF_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightChoice = getCeilingValue(R172K_TAKEOFF_WEIGHTS_KG, weightKg);
+  if (!weightChoice) {
+    return null;
+  }
+
+  const weightTable = getR172KTakeoffWeightTable(weightChoice.value);
+  if (!weightTable) {
+    return null;
+  }
+
+  const altitudeChoice = getCeilingValue(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeChoice) {
+    return null;
+  }
+
+  const altitudeIndex = weightTable.pressureAltitudesFt.indexOf(altitudeChoice.value);
+  const groundRollPoint = getCeilingTemperaturePoint(
+    getR172KTakeoffTemperaturePoints(weightTable, "groundRoll", altitudeIndex),
+    temperatureC
+  );
+  const obstaclePoint = getCeilingTemperaturePoint(
+    getR172KTakeoffTemperaturePoints(weightTable, "obstacle50ft", altitudeIndex),
+    temperatureC
+  );
+  if (!groundRollPoint || !obstaclePoint) {
+    return null;
+  }
+
+  const corrected = applyR172KTakeoffCorrections(groundRollPoint.point.valueM, obstaclePoint.point.valueM, runway, wind);
+
+  return {
+    correctedGroundRollM: corrected.correctedGroundRollM,
+    correctedObstacle50ftM: corrected.correctedObstacle50ftM,
+    corrections: corrected.corrections.slice(),
+    groundRollM: groundRollPoint.point.valueM,
+    obstacle50ftM: obstaclePoint.point.valueM,
+    pressureAltitudeClamped: Boolean(altitudeChoice.clamped),
+    pressureAltitudeFt: altitudeChoice.value,
+    temperatureClamped: Boolean(groundRollPoint.clamped || obstaclePoint.clamped),
+    temperatureLabel: groundRollPoint.point.label,
+    weightClamped: Boolean(weightChoice.clamped),
+    weightKg: Math.round(weightChoice.value)
+  };
+}
+
+function getR172KTakeoffPerformance(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  if (!R172K_TAKEOFF_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightBracket = getBracket(R172K_TAKEOFF_WEIGHTS_KG, weightKg);
+  if (!weightBracket) {
+    return null;
+  }
+
+  const lowerTable = getR172KTakeoffWeightTable(weightBracket.lower);
+  const upperTable = getR172KTakeoffWeightTable(weightBracket.upper);
+  if (!lowerTable || !upperTable) {
+    return null;
+  }
+
+  const lowerGroundRoll = interpolateR172KTakeoffMetricForTable(lowerTable, "groundRoll", pressureAltitudeFt, temperatureC);
+  const upperGroundRoll = interpolateR172KTakeoffMetricForTable(upperTable, "groundRoll", pressureAltitudeFt, temperatureC);
+  const lowerObstacle = interpolateR172KTakeoffMetricForTable(lowerTable, "obstacle50ft", pressureAltitudeFt, temperatureC);
+  const upperObstacle = interpolateR172KTakeoffMetricForTable(upperTable, "obstacle50ft", pressureAltitudeFt, temperatureC);
+
+  if (![lowerGroundRoll, upperGroundRoll, lowerObstacle, upperObstacle].every(Number.isFinite)) {
+    return null;
+  }
+
+  const baseGroundRollM = lerp(lowerGroundRoll, upperGroundRoll, weightBracket.ratio);
+  const baseObstacle50ftM = lerp(lowerObstacle, upperObstacle, weightBracket.ratio);
+  const interpolatedCorrection = applyR172KTakeoffCorrections(baseGroundRollM, baseObstacle50ftM, runway, wind);
+  const conservativeTableRead = getR172KTakeoffConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind);
+  let correctedGroundRollM = interpolatedCorrection.correctedGroundRollM;
+  let correctedObstacle50ftM = interpolatedCorrection.correctedObstacle50ftM;
+  let antiUnderestimateApplied = false;
+
+  if (conservativeTableRead) {
+    const guardedGroundRollM = Math.max(correctedGroundRollM, conservativeTableRead.correctedGroundRollM);
+    const guardedObstacle50ftM = Math.max(correctedObstacle50ftM, conservativeTableRead.correctedObstacle50ftM);
+    antiUnderestimateApplied =
+      guardedGroundRollM > correctedGroundRollM + 0.001 ||
+      guardedObstacle50ftM > correctedObstacle50ftM + 0.001;
+    correctedGroundRollM = guardedGroundRollM;
+    correctedObstacle50ftM = guardedObstacle50ftM;
+  }
+
+  const availableDistanceM = runway ? getRunwayToraM(runway) || null : null;
+
+  return {
+    availableDistanceM,
+    antiUnderestimateApplied,
+    baseGroundRollM,
+    baseObstacle50ftM,
+    conservativeCorrectedGroundRollM: conservativeTableRead ? conservativeTableRead.correctedGroundRollM : null,
+    conservativeCorrectedObstacle50ftM: conservativeTableRead ? conservativeTableRead.correctedObstacle50ftM : null,
+    conservativeTableRead,
+    correctedGroundRollM,
+    correctedObstacle50ftM,
+    corrections: interpolatedCorrection.corrections,
+    groundRollMarginM: availableDistanceM ? availableDistanceM - correctedGroundRollM : null,
+    interpolatedCorrectedGroundRollM: interpolatedCorrection.correctedGroundRollM,
+    interpolatedCorrectedObstacle50ftM: interpolatedCorrection.correctedObstacle50ftM,
+    liftoffSpeedKias: interpolateR172KTakeoffSettingByWeight("liftoffSpeedKias", weightKg),
+    obstacle50ftMarginM: availableDistanceM ? availableDistanceM - correctedObstacle50ftM : null,
+    obstacle50ftSpeedKias: interpolateR172KTakeoffSettingByWeight("obstacle50ftSpeedKias", weightKg),
+    pressureAltitudeClamped: getBracket(lowerTable.pressureAltitudesFt, pressureAltitudeFt).clamped === "high",
+    supportedPressureAltitudeFt: [lowerTable.pressureAltitudesFt[0], lowerTable.pressureAltitudesFt[lowerTable.pressureAltitudesFt.length - 1]],
+    supportedTemperatureC: [lowerTable.temperaturesC[0], lowerTable.temperaturesC[lowerTable.temperaturesC.length - 1]],
+    supportedWeightKg: [R172K_TAKEOFF_WEIGHTS_KG[0], R172K_TAKEOFF_WEIGHTS_KG[R172K_TAKEOFF_WEIGHTS_KG.length - 1]],
+    tableBasis: lowerTable.runway || "Paved, level, dry",
+    temperatureClamped: temperatureC < lowerTable.temperaturesC[0] || temperatureC > lowerTable.temperaturesC[lowerTable.temperaturesC.length - 1],
+    weightClamped: Boolean(weightBracket.clamped),
+    weightUsedKg: weightBracket.clamped === "low"
+      ? weightBracket.lower
+      : weightBracket.clamped === "high"
+        ? weightBracket.upper
+        : weightKg
+  };
+}
+
+function getSelectedTakeoffPerformance(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  return selectedAircraftUsesR172KPerformanceTables()
+    ? getR172KTakeoffPerformance(weightKg, pressureAltitudeFt, temperatureC, runway, wind)
+    : getP2006TTakeoffPerformance(weightKg, pressureAltitudeFt, temperatureC, runway, wind);
+}
+
+function getSelectedTakeoffConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  return selectedAircraftUsesR172KPerformanceTables()
+    ? getR172KTakeoffConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind)
+    : getP2006TConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind);
+}
+
+function getR172KLandingEntryForKg(weightKg) {
+  return R172K_LANDING_WEIGHT_ENTRIES.find((entry) => Math.abs(entry.kg - weightKg) < 0.001) || null;
+}
+
+function getR172KLandingWeightTable(weightKg) {
+  const entry = getR172KLandingEntryForKg(weightKg);
+  return entry && R172K_LANDING && R172K_LANDING.weightsLb
+    ? R172K_LANDING.weightsLb[String(entry.lb)] || null
+    : null;
+}
+
+function getR172KLandingTemperaturePoints(weightTable, metricKey, altitudeIndex) {
+  if (!weightTable || !weightTable.distanceM || !Array.isArray(weightTable.temperaturesC)) {
+    return [];
+  }
+
+  const row = weightTable.distanceM[metricKey] && weightTable.distanceM[metricKey][altitudeIndex];
+  if (!Array.isArray(row)) {
+    return [];
+  }
+
+  return weightTable.temperaturesC
+    .map((tempC, index) => ({
+      id: "col-" + index,
+      label: tempC + " C",
+      tempC,
+      valueM: row[index]
+    }))
+    .filter((point) => Number.isFinite(point.tempC) && Number.isFinite(point.valueM))
+    .sort((left, right) => left.tempC - right.tempC);
+}
+
+function interpolateR172KLandingMetricForTable(weightTable, metricKey, pressureAltitudeFt, temperatureC) {
+  if (!weightTable || !Array.isArray(weightTable.pressureAltitudesFt)) {
+    return null;
+  }
+
+  const altitudeBracket = getBracket(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeBracket) {
+    return null;
+  }
+
+  const lowerIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.lower);
+  const upperIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.upper);
+  const lowerValue = interpolatePointsByTemperature(
+    getR172KLandingTemperaturePoints(weightTable, metricKey, lowerIndex),
+    temperatureC
+  );
+  const upperValue = interpolatePointsByTemperature(
+    getR172KLandingTemperaturePoints(weightTable, metricKey, upperIndex),
+    temperatureC
+  );
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, altitudeBracket.ratio);
+}
+
+function interpolateR172KLandingSettingByWeight(settingKey, weightKg) {
+  if (!R172K_LANDING_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightBracket = getBracket(R172K_LANDING_WEIGHTS_KG, weightKg);
+  if (!weightBracket) {
+    return null;
+  }
+
+  const lowerTable = getR172KLandingWeightTable(weightBracket.lower);
+  const upperTable = getR172KLandingWeightTable(weightBracket.upper);
+  const lowerValue = lowerTable ? lowerTable[settingKey] : null;
+  const upperValue = upperTable ? upperTable[settingKey] : null;
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, weightBracket.ratio);
+}
+
+function applyR172KLandingCorrections(baseGroundRollM, baseObstacle50ftM, runway, wind) {
+  const corrections = [];
+  const headwindKt = wind && wind.headwind > 0 ? wind.headwind : 0;
+  const tailwindKt = wind && wind.headwind < 0 ? Math.abs(wind.headwind) : 0;
+  const correctionRules = R172K_LANDING && R172K_LANDING.corrections ? R172K_LANDING.corrections : {};
+  let correctedGroundRollM = baseGroundRollM;
+  let correctedObstacle50ftM = baseObstacle50ftM;
+
+  if (headwindKt > 0) {
+    const factor = Math.max(0, 1 - headwindKt * toNumber(correctionRules.headwindDecreasePercentPerKt, 10 / 9) / 100);
+    correctedGroundRollM *= factor;
+    correctedObstacle50ftM *= factor;
+    corrections.push(Math.round(headwindKt) + " kt headwind");
+  } else if (tailwindKt > 0) {
+    const limitedTailwindKt = Math.min(tailwindKt, toNumber(correctionRules.tailwindLimitKt, 10));
+    const factor = 1 + limitedTailwindKt * toNumber(correctionRules.tailwindIncreasePercentPerKt, 5) / 100;
+    correctedGroundRollM *= factor;
+    correctedObstacle50ftM *= factor;
+    corrections.push(Math.round(tailwindKt) + " kt tailwind");
+  }
+
+  const runwaySurface = runway ? String(runway.surface || "").toLowerCase() : "";
+  if (["grass", "turf"].includes(runwaySurface)) {
+    const grassAdditionM = baseGroundRollM * toNumber(correctionRules.dryGrassIncreaseByGroundRollPercent, 40) / 100;
+    correctedGroundRollM += grassAdditionM;
+    correctedObstacle50ftM += grassAdditionM;
+    corrections.push("dry grass");
+  }
+
+  return {
+    correctedGroundRollM: Math.max(0, correctedGroundRollM),
+    correctedObstacle50ftM: Math.max(0, correctedObstacle50ftM),
+    corrections,
+    headwindKt,
+    runwaySurface,
+    tailwindKt
+  };
+}
+
+function getR172KLandingConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  if (!R172K_LANDING_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightChoice = getCeilingValue(R172K_LANDING_WEIGHTS_KG, weightKg);
+  if (!weightChoice) {
+    return null;
+  }
+
+  const weightTable = getR172KLandingWeightTable(weightChoice.value);
+  if (!weightTable) {
+    return null;
+  }
+
+  const altitudeChoice = getCeilingValue(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeChoice) {
+    return null;
+  }
+
+  const altitudeIndex = weightTable.pressureAltitudesFt.indexOf(altitudeChoice.value);
+  const groundRollPoint = getCeilingTemperaturePoint(
+    getR172KLandingTemperaturePoints(weightTable, "groundRoll", altitudeIndex),
+    temperatureC
+  );
+  const obstaclePoint = getCeilingTemperaturePoint(
+    getR172KLandingTemperaturePoints(weightTable, "obstacle50ft", altitudeIndex),
+    temperatureC
+  );
+  if (!groundRollPoint || !obstaclePoint) {
+    return null;
+  }
+
+  const corrected = applyR172KLandingCorrections(groundRollPoint.point.valueM, obstaclePoint.point.valueM, runway, wind);
+
+  return {
+    correctedGroundRollM: corrected.correctedGroundRollM,
+    correctedObstacle50ftM: corrected.correctedObstacle50ftM,
+    corrections: corrected.corrections.slice(),
+    groundRollM: groundRollPoint.point.valueM,
+    obstacle50ftM: obstaclePoint.point.valueM,
+    pressureAltitudeClamped: Boolean(altitudeChoice.clamped),
+    pressureAltitudeFt: altitudeChoice.value,
+    temperatureClamped: Boolean(groundRollPoint.clamped || obstaclePoint.clamped),
+    temperatureLabel: groundRollPoint.point.label,
+    weightClamped: Boolean(weightChoice.clamped),
+    weightKg: Math.round(weightChoice.value)
+  };
+}
+
+function getR172KLandingPerformance(weightKg, pressureAltitudeFt, temperatureC, runway, wind) {
+  if (!R172K_LANDING_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightBracket = getBracket(R172K_LANDING_WEIGHTS_KG, weightKg);
+  if (!weightBracket) {
+    return null;
+  }
+
+  const lowerTable = getR172KLandingWeightTable(weightBracket.lower);
+  const upperTable = getR172KLandingWeightTable(weightBracket.upper);
+  if (!lowerTable || !upperTable) {
+    return null;
+  }
+
+  const lowerGroundRoll = interpolateR172KLandingMetricForTable(lowerTable, "groundRoll", pressureAltitudeFt, temperatureC);
+  const upperGroundRoll = interpolateR172KLandingMetricForTable(upperTable, "groundRoll", pressureAltitudeFt, temperatureC);
+  const lowerObstacle = interpolateR172KLandingMetricForTable(lowerTable, "obstacle50ft", pressureAltitudeFt, temperatureC);
+  const upperObstacle = interpolateR172KLandingMetricForTable(upperTable, "obstacle50ft", pressureAltitudeFt, temperatureC);
+
+  if (![lowerGroundRoll, upperGroundRoll, lowerObstacle, upperObstacle].every(Number.isFinite)) {
+    return null;
+  }
+
+  const baseGroundRollM = lerp(lowerGroundRoll, upperGroundRoll, weightBracket.ratio);
+  const baseObstacle50ftM = lerp(lowerObstacle, upperObstacle, weightBracket.ratio);
+  const interpolatedCorrection = applyR172KLandingCorrections(baseGroundRollM, baseObstacle50ftM, runway, wind);
+  const conservativeTableRead = getR172KLandingConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC, runway, wind);
+  let correctedGroundRollM = interpolatedCorrection.correctedGroundRollM;
+  let correctedObstacle50ftM = interpolatedCorrection.correctedObstacle50ftM;
+  let antiUnderestimateApplied = false;
+
+  if (conservativeTableRead) {
+    const guardedGroundRollM = Math.max(correctedGroundRollM, conservativeTableRead.correctedGroundRollM);
+    const guardedObstacle50ftM = Math.max(correctedObstacle50ftM, conservativeTableRead.correctedObstacle50ftM);
+    antiUnderestimateApplied =
+      guardedGroundRollM > correctedGroundRollM + 0.001 ||
+      guardedObstacle50ftM > correctedObstacle50ftM + 0.001;
+    correctedGroundRollM = guardedGroundRollM;
+    correctedObstacle50ftM = guardedObstacle50ftM;
+  }
+
+  const availableDistanceM = runway ? getRunwayLdaM(runway) || null : null;
+
+  return {
+    availableDistanceM,
+    antiUnderestimateApplied,
+    baseGroundRollM,
+    baseObstacle50ftM,
+    conservativeCorrectedGroundRollM: conservativeTableRead ? conservativeTableRead.correctedGroundRollM : null,
+    conservativeCorrectedObstacle50ftM: conservativeTableRead ? conservativeTableRead.correctedObstacle50ftM : null,
+    conservativeTableRead,
+    correctedGroundRollM,
+    correctedObstacle50ftM,
+    corrections: interpolatedCorrection.corrections,
+    flaps: Number.isFinite(lowerTable.flapsDeg) ? "LDG " + lowerTable.flapsDeg + " deg" : null,
+    groundRollMarginM: availableDistanceM ? availableDistanceM - correctedGroundRollM : null,
+    interpolatedCorrectedGroundRollM: interpolatedCorrection.correctedGroundRollM,
+    interpolatedCorrectedObstacle50ftM: interpolatedCorrection.correctedObstacle50ftM,
+    obstacle50ftMarginM: availableDistanceM ? availableDistanceM - correctedObstacle50ftM : null,
+    pressureAltitudeClamped: getBracket(lowerTable.pressureAltitudesFt, pressureAltitudeFt).clamped === "high",
+    shortFinalApproachSpeedKias: interpolateR172KLandingSettingByWeight("shortFinalApproachSpeedKias", weightKg),
+    supportedPressureAltitudeFt: [lowerTable.pressureAltitudesFt[0], lowerTable.pressureAltitudesFt[lowerTable.pressureAltitudesFt.length - 1]],
+    supportedTemperatureC: [lowerTable.temperaturesC[0], lowerTable.temperaturesC[lowerTable.temperaturesC.length - 1]],
+    supportedWeightKg: [R172K_LANDING_WEIGHTS_KG[0], R172K_LANDING_WEIGHTS_KG[R172K_LANDING_WEIGHTS_KG.length - 1]],
+    tableBasis: lowerTable.runway || "Paved, level, dry",
+    temperatureClamped: temperatureC < lowerTable.temperaturesC[0] || temperatureC > lowerTable.temperaturesC[lowerTable.temperaturesC.length - 1],
+    throttle: lowerTable.throttle || null,
+    weightAboveSupported: weightKg > R172K_LANDING_WEIGHTS_KG[R172K_LANDING_WEIGHTS_KG.length - 1],
+    weightBelowSupported: weightKg < R172K_LANDING_WEIGHTS_KG[0],
+    weightClamped: Boolean(weightBracket.clamped),
+    weightLowerKg: weightBracket.lower,
+    weightUpperKg: weightBracket.upper,
+    weightUsedKg: weightBracket.clamped === "low"
+      ? weightBracket.lower
+      : weightBracket.clamped === "high"
+        ? weightBracket.upper
+        : weightKg
+  };
+}
+
+function getR172KClimbEntryForKg(weightKg) {
+  return R172K_CLIMB_WEIGHT_ENTRIES.find((entry) => Math.abs(entry.kg - weightKg) < 0.001) || null;
+}
+
+function getR172KClimbWeightTable(weightKg) {
+  const entry = getR172KClimbEntryForKg(weightKg);
+  return entry && R172K_CLIMB && R172K_CLIMB.weightsLb
+    ? R172K_CLIMB.weightsLb[String(entry.lb)] || null
+    : null;
+}
+
+function getR172KClimbTemperaturePoints(weightTable, altitudeIndex) {
+  if (!R172K_CLIMB || !weightTable || !Array.isArray(weightTable.rateOfClimbFpm)) {
+    return [];
+  }
+
+  const row = weightTable.rateOfClimbFpm[altitudeIndex] || [];
+  return (weightTable.temperaturesC || R172K_CLIMB.temperaturesC || [])
+    .map((tempC, index) => ({
+      id: "col-" + index,
+      label: tempC + " C",
+      tempC,
+      valueFpm: row[index],
+      valueM: row[index]
+    }))
+    .filter((point) => Number.isFinite(point.tempC) && Number.isFinite(point.valueFpm))
+    .sort((left, right) => left.tempC - right.tempC);
+}
+
+function interpolateR172KClimbRateForTable(weightTable, pressureAltitudeFt, temperatureC) {
+  if (!R172K_CLIMB || !weightTable || !Array.isArray(weightTable.pressureAltitudesFt)) {
+    return null;
+  }
+
+  const altitudeBracket = getBracket(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeBracket) {
+    return null;
+  }
+
+  const lowerIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.lower);
+  const upperIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.upper);
+  const lowerValue = interpolatePointsByTemperature(
+    getR172KClimbTemperaturePoints(weightTable, lowerIndex),
+    temperatureC
+  );
+  const upperValue = interpolatePointsByTemperature(
+    getR172KClimbTemperaturePoints(weightTable, upperIndex),
+    temperatureC
+  );
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, altitudeBracket.ratio);
+}
+
+function interpolateR172KClimbSpeedForTable(weightTable, pressureAltitudeFt) {
+  if (!weightTable || !Array.isArray(weightTable.climbSpeedKias)) {
+    return null;
+  }
+
+  const altitudeBracket = getBracket(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeBracket) {
+    return null;
+  }
+
+  const lowerIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.lower);
+  const upperIndex = weightTable.pressureAltitudesFt.indexOf(altitudeBracket.upper);
+  const lowerValue = weightTable.climbSpeedKias[lowerIndex];
+  const upperValue = weightTable.climbSpeedKias[upperIndex];
+
+  if (!Number.isFinite(lowerValue) || !Number.isFinite(upperValue)) {
+    return null;
+  }
+
+  return lerp(lowerValue, upperValue, altitudeBracket.ratio);
+}
+
+function getR172KClimbConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC) {
+  if (!R172K_CLIMB || !R172K_CLIMB_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightChoice = getCeilingValue(R172K_CLIMB_WEIGHTS_KG, weightKg);
+  if (!weightChoice) {
+    return null;
+  }
+
+  const weightTable = getR172KClimbWeightTable(weightChoice.value);
+  if (!weightTable) {
+    return null;
+  }
+
+  const altitudeChoice = getCeilingValue(weightTable.pressureAltitudesFt, pressureAltitudeFt);
+  if (!altitudeChoice) {
+    return null;
+  }
+
+  const altitudeIndex = weightTable.pressureAltitudesFt.indexOf(altitudeChoice.value);
+  const temperatureChoice = getCeilingTemperaturePoint(
+    getR172KClimbTemperaturePoints(weightTable, altitudeIndex),
+    temperatureC
+  );
+  if (!temperatureChoice || !Array.isArray(weightTable.climbSpeedKias)) {
+    return null;
+  }
+
+  const climbSpeedKias = weightTable.climbSpeedKias[altitudeIndex];
+  if (!Number.isFinite(climbSpeedKias)) {
+    return null;
+  }
+
+  return {
+    climbSpeedKias,
+    climbSpeedVyKias: climbSpeedKias,
+    pressureAltitudeClamped: Boolean(altitudeChoice.clamped),
+    pressureAltitudeFt: altitudeChoice.value,
+    rateOfClimbFpm: temperatureChoice.point.valueFpm,
+    speedLabel: R172K_CLIMB.speedLabel || "Max ROC",
+    temperatureClamped: Boolean(temperatureChoice.clamped),
+    temperatureLabel: temperatureChoice.point.label,
+    weightClamped: Boolean(weightChoice.clamped),
+    weightKg: Math.round(weightChoice.value)
+  };
+}
+
+function getR172KClimbPerformance(weightKg, pressureAltitudeFt, temperatureC) {
+  if (!R172K_CLIMB || !R172K_CLIMB_WEIGHTS_KG.length) {
+    return null;
+  }
+
+  const weightBracket = getBracket(R172K_CLIMB_WEIGHTS_KG, weightKg);
+  if (!weightBracket) {
+    return null;
+  }
+
+  const lowerTable = getR172KClimbWeightTable(weightBracket.lower);
+  const upperTable = getR172KClimbWeightTable(weightBracket.upper);
+  if (!lowerTable || !upperTable) {
+    return null;
+  }
+
+  const lowerRate = interpolateR172KClimbRateForTable(lowerTable, pressureAltitudeFt, temperatureC);
+  const upperRate = interpolateR172KClimbRateForTable(upperTable, pressureAltitudeFt, temperatureC);
+  const lowerSpeed = interpolateR172KClimbSpeedForTable(lowerTable, pressureAltitudeFt);
+  const upperSpeed = interpolateR172KClimbSpeedForTable(upperTable, pressureAltitudeFt);
+
+  if (!Number.isFinite(lowerRate) || !Number.isFinite(upperRate) || !Number.isFinite(lowerSpeed) || !Number.isFinite(upperSpeed)) {
+    return null;
+  }
+
+  const interpolatedRateOfClimbFpm = lerp(lowerRate, upperRate, weightBracket.ratio);
+  const interpolatedClimbSpeedKias = lerp(lowerSpeed, upperSpeed, weightBracket.ratio);
+  const conservativeTableRead = getR172KClimbConservativeTableRead(weightKg, pressureAltitudeFt, temperatureC);
+  let rateOfClimbFpm = interpolatedRateOfClimbFpm;
+  let antiOverestimateApplied = false;
+
+  if (conservativeTableRead && Number.isFinite(conservativeTableRead.rateOfClimbFpm)) {
+    const guardedRateOfClimbFpm = Math.min(rateOfClimbFpm, conservativeTableRead.rateOfClimbFpm);
+    antiOverestimateApplied = guardedRateOfClimbFpm < rateOfClimbFpm - 0.001;
+    rateOfClimbFpm = guardedRateOfClimbFpm;
+  }
+
+  return {
+    antiOverestimateApplied,
+    climbSpeedKias: interpolatedClimbSpeedKias,
+    climbSpeedVyKias: interpolatedClimbSpeedKias,
+    conservativeClimbSpeedKias: conservativeTableRead ? conservativeTableRead.climbSpeedKias : null,
+    conservativeClimbSpeedVyKias: conservativeTableRead ? conservativeTableRead.climbSpeedKias : null,
+    conservativeRateOfClimbFpm: conservativeTableRead ? conservativeTableRead.rateOfClimbFpm : null,
+    conservativeTableRead,
+    flaps: R172K_CLIMB.flaps,
+    interpolatedClimbSpeedKias,
+    interpolatedClimbSpeedVyKias: interpolatedClimbSpeedKias,
+    interpolatedRateOfClimbFpm,
+    landingGear: R172K_CLIMB.landingGear,
+    powerSetting: R172K_CLIMB.powerSetting,
+    pressureAltitudeClamped: Boolean(getBracket(lowerTable.pressureAltitudesFt, pressureAltitudeFt).clamped),
+    rateOfClimbFpm,
+    speedLabel: R172K_CLIMB.speedLabel || "Max ROC",
+    supportedPressureAltitudeFt: [lowerTable.pressureAltitudesFt[0], lowerTable.pressureAltitudesFt[lowerTable.pressureAltitudesFt.length - 1]],
+    supportedTemperatureC: [R172K_CLIMB.temperaturesC[0], R172K_CLIMB.temperaturesC[R172K_CLIMB.temperaturesC.length - 1]],
+    supportedWeightKg: [R172K_CLIMB_WEIGHTS_KG[0], R172K_CLIMB_WEIGHTS_KG[R172K_CLIMB_WEIGHTS_KG.length - 1]],
+    temperatureClamped: temperatureC < R172K_CLIMB.temperaturesC[0] || temperatureC > R172K_CLIMB.temperaturesC[R172K_CLIMB.temperaturesC.length - 1],
+    weightAboveSupported: weightKg > R172K_CLIMB_WEIGHTS_KG[R172K_CLIMB_WEIGHTS_KG.length - 1],
+    weightBelowSupported: weightKg < R172K_CLIMB_WEIGHTS_KG[0],
+    weightClamped: Boolean(weightBracket.clamped),
+    weightLowerKg: Math.round(weightBracket.lower),
+    weightUpperKg: Math.round(weightBracket.upper),
+    weightUsedKg: weightBracket.clamped === "low"
+      ? Math.round(weightBracket.lower)
+      : weightBracket.clamped === "high"
+        ? Math.round(weightBracket.upper)
+        : Math.round(weightKg)
+  };
+}
+
 function getP2006TClimbTemperaturePoints(weightTable, altitudeIndex, climbData = P2006T_CLIMB) {
   if (!climbData || !weightTable || !Array.isArray(weightTable.rateOfClimbFpm)) {
     return [];
@@ -14595,18 +15619,39 @@ function getCruiseMapInHgFromState() {
   return Math.max(0, Math.min(99.9, mapInHg));
 }
 
-function interpolateCruiseSettingByTemperature(setting, isaDeltaC) {
-  if (!P2006T_CRUISE || !setting || !Array.isArray(setting.values)) {
+function getCruiseEngineCount(cruiseData) {
+  const explicitCount = toNumber(cruiseData && cruiseData.engineCount, NaN);
+  if (Number.isFinite(explicitCount) && explicitCount > 0) {
+    return explicitCount;
+  }
+  return cruiseData === P2006T_CRUISE ? 2 : 1;
+}
+
+function getCruiseTotalFuelLphFromEntry(entry, cruiseData) {
+  if (!entry) {
+    return NaN;
+  }
+  if (Number.isFinite(entry.fuelTotalLph)) {
+    return entry.fuelTotalLph;
+  }
+  if (Number.isFinite(entry.fuelPerEngineLph)) {
+    return entry.fuelPerEngineLph * getCruiseEngineCount(cruiseData);
+  }
+  return NaN;
+}
+
+function interpolateCruiseSettingByTemperature(setting, isaDeltaC, cruiseData = P2006T_CRUISE) {
+  if (!cruiseData || !setting || !Array.isArray(setting.values)) {
     return null;
   }
 
-  const temperatureBracket = getBracket(P2006T_CRUISE.isaDeltaC, isaDeltaC);
+  const temperatureBracket = getBracket(cruiseData.isaDeltaC, isaDeltaC);
   if (!temperatureBracket) {
     return null;
   }
 
-  const lowerIndex = P2006T_CRUISE.isaDeltaC.indexOf(temperatureBracket.lower);
-  const upperIndex = P2006T_CRUISE.isaDeltaC.indexOf(temperatureBracket.upper);
+  const lowerIndex = cruiseData.isaDeltaC.indexOf(temperatureBracket.lower);
+  const upperIndex = cruiseData.isaDeltaC.indexOf(temperatureBracket.upper);
   const lowerValue = setting.values[lowerIndex];
   const upperValue = setting.values[upperIndex];
 
@@ -14614,9 +15659,15 @@ function interpolateCruiseSettingByTemperature(setting, isaDeltaC) {
     return null;
   }
 
+  const lowerFuelTotalLph = getCruiseTotalFuelLphFromEntry(lowerValue, cruiseData);
+  const upperFuelTotalLph = getCruiseTotalFuelLphFromEntry(upperValue, cruiseData);
+  if (!Number.isFinite(lowerFuelTotalLph) || !Number.isFinite(upperFuelTotalLph)) {
+    return null;
+  }
+
   return {
     fuelPerEngineLph: lerp(lowerValue.fuelPerEngineLph, upperValue.fuelPerEngineLph, temperatureBracket.ratio),
-    fuelTotalLph: lerp(lowerValue.fuelPerEngineLph, upperValue.fuelPerEngineLph, temperatureBracket.ratio) * 2,
+    fuelTotalLph: lerp(lowerFuelTotalLph, upperFuelTotalLph, temperatureBracket.ratio),
     ktas: lerp(lowerValue.ktas, upperValue.ktas, temperatureBracket.ratio),
     mapInHg: setting.mapInHg,
     pwrPct: lerp(lowerValue.pwrPct, upperValue.pwrPct, temperatureBracket.ratio),
@@ -14624,18 +15675,18 @@ function interpolateCruiseSettingByTemperature(setting, isaDeltaC) {
   };
 }
 
-function getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC) {
-  if (!P2006T_CRUISE || !P2006T_CRUISE.tables) {
+function getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC, cruiseData = P2006T_CRUISE) {
+  if (!cruiseData || !cruiseData.tables) {
     return [];
   }
 
-  const table = P2006T_CRUISE.tables[String(pressureAltitudeFt)];
+  const table = cruiseData.tables[String(pressureAltitudeFt)];
   if (!Array.isArray(table)) {
     return [];
   }
 
   return table
-    .map((setting) => interpolateCruiseSettingByTemperature(setting, isaDeltaC))
+    .map((setting) => interpolateCruiseSettingByTemperature(setting, isaDeltaC, cruiseData))
     .filter(Boolean);
 }
 
@@ -14655,18 +15706,21 @@ function getCruiseManualTarget() {
 }
 
 function getCruiseRangeScore(entry, windComponentKt) {
-  if (!entry || !Number.isFinite(entry.ktas) || !Number.isFinite(entry.fuelPerEngineLph)) {
+  if (!entry || !Number.isFinite(entry.ktas)) {
     return -Infinity;
   }
 
   const fuelTotalLph = Number.isFinite(entry.fuelTotalLph)
     ? entry.fuelTotalLph
-    : entry.fuelPerEngineLph * 2;
+    : entry.fuelPerEngineLph;
+  if (!Number.isFinite(fuelTotalLph) || fuelTotalLph <= 0) {
+    return -Infinity;
+  }
   const groundSpeedKt = Math.max(0, entry.ktas + windComponentKt);
   return groundSpeedKt / Math.max(fuelTotalLph, 0.001);
 }
 
-function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
+function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg, cruiseData = P2006T_CRUISE) {
   const validEntries = Array.isArray(entries)
     ? entries.filter((entry) =>
         entry &&
@@ -14674,7 +15728,7 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
         Number.isFinite(entry.mapInHg) &&
         Number.isFinite(entry.pwrPct) &&
         Number.isFinite(entry.ktas) &&
-        Number.isFinite(entry.fuelPerEngineLph)
+        Number.isFinite(getCruiseTotalFuelLphFromEntry(entry, cruiseData))
       )
     : [];
 
@@ -14689,7 +15743,7 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
   if (exactMatch) {
     return {
       ...exactMatch,
-      fuelTotalLph: exactMatch.fuelPerEngineLph * 2
+      fuelTotalLph: getCruiseTotalFuelLphFromEntry(exactMatch, cruiseData)
     };
   }
 
@@ -14708,6 +15762,7 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
   const totals = closestEntries.reduce((accumulator, item) => {
     const weight = 1 / Math.max(item.distance * item.distance, 0.0001);
     accumulator.fuelPerEngineLph += item.entry.fuelPerEngineLph * weight;
+    accumulator.fuelTotalLph += getCruiseTotalFuelLphFromEntry(item.entry, cruiseData) * weight;
     accumulator.ktas += item.entry.ktas * weight;
     accumulator.mapInHg += item.entry.mapInHg * weight;
     accumulator.pwrPct += item.entry.pwrPct * weight;
@@ -14716,6 +15771,7 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
     return accumulator;
   }, {
     fuelPerEngineLph: 0,
+    fuelTotalLph: 0,
     ktas: 0,
     mapInHg: 0,
     pwrPct: 0,
@@ -14730,7 +15786,7 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
   const fuelPerEngineLph = totals.fuelPerEngineLph / totals.weight;
   return {
     fuelPerEngineLph,
-    fuelTotalLph: fuelPerEngineLph * 2,
+    fuelTotalLph: totals.fuelTotalLph / totals.weight,
     ktas: totals.ktas / totals.weight,
     mapInHg: totals.mapInHg / totals.weight,
     pwrPct: totals.pwrPct / totals.weight,
@@ -14738,18 +15794,18 @@ function interpolateCruiseByEngineSetting(entries, targetRpm, targetMapInHg) {
   };
 }
 
-function pickCruisePerformance(entries, mode, windComponentKt, manualTarget) {
+function pickCruisePerformance(entries, mode, windComponentKt, manualTarget, cruiseData = P2006T_CRUISE) {
   if (!Array.isArray(entries) || !entries.length) {
     return null;
   }
 
   if (mode === "manual") {
     const target = manualTarget || getCruiseManualTarget();
-    return interpolateCruiseByEngineSetting(entries, target.rpm, target.mapInHg);
+    return interpolateCruiseByEngineSetting(entries, target.rpm, target.mapInHg, cruiseData);
   }
 
   const validEntries = entries
-    .filter((entry) => entry && Number.isFinite(entry.fuelPerEngineLph))
+    .filter((entry) => entry && Number.isFinite(getCruiseTotalFuelLphFromEntry(entry, cruiseData)))
     .slice();
 
   if (!validEntries.length) {
@@ -14775,12 +15831,13 @@ function pickCruisePerformance(entries, mode, windComponentKt, manualTarget) {
     })[0] || null;
 }
 
-function getCruisePerformanceAtAltitude(pressureAltitudeFt, isaDeltaC, mode, windComponentKt, manualTarget) {
+function getCruisePerformanceAtAltitude(pressureAltitudeFt, isaDeltaC, mode, windComponentKt, manualTarget, cruiseData = P2006T_CRUISE) {
   return pickCruisePerformance(
-    getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC),
+    getCruiseEntriesAtAltitude(pressureAltitudeFt, isaDeltaC, cruiseData),
     mode,
     windComponentKt,
-    manualTarget
+    manualTarget,
+    cruiseData
   );
 }
 
@@ -14797,20 +15854,20 @@ function getCruiseSettingLabel(performance, mode, manualTarget) {
   return Math.round(performance.rpm) + " RPM / MAP " + roundTo(performance.mapInHg, 1);
 }
 
-function getP2006TCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
-  if (!P2006T_CRUISE) {
+function getCruisePerformanceForTable(cruiseData, pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  if (!cruiseData) {
     return null;
   }
 
   const activeMode = mode === "eco-distance" || mode === "manual" ? mode : "eco-time";
   const isaDeltaC = oatC - getIsaTemperature(pressureAltitudeFt);
-  const altitudeBracket = getBracket(P2006T_CRUISE.pressureAltitudesFt, pressureAltitudeFt);
+  const altitudeBracket = getBracket(cruiseData.pressureAltitudesFt, pressureAltitudeFt);
   if (!altitudeBracket) {
     return null;
   }
 
-  const lowerPerformance = getCruisePerformanceAtAltitude(altitudeBracket.lower, isaDeltaC, activeMode, windComponentKt, manualTarget);
-  const upperPerformance = getCruisePerformanceAtAltitude(altitudeBracket.upper, isaDeltaC, activeMode, windComponentKt, manualTarget);
+  const lowerPerformance = getCruisePerformanceAtAltitude(altitudeBracket.lower, isaDeltaC, activeMode, windComponentKt, manualTarget, cruiseData);
+  const upperPerformance = getCruisePerformanceAtAltitude(altitudeBracket.upper, isaDeltaC, activeMode, windComponentKt, manualTarget, cruiseData);
   if (!lowerPerformance || !upperPerformance) {
     return null;
   }
@@ -14820,10 +15877,16 @@ function getP2006TCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, m
   const ktas = lerp(lowerPerformance.ktas, upperPerformance.ktas, altitudeBracket.ratio);
   const pwrPct = lerp(lowerPerformance.pwrPct, upperPerformance.pwrPct, altitudeBracket.ratio);
   const fuelPerEngineLph = lerp(lowerPerformance.fuelPerEngineLph, upperPerformance.fuelPerEngineLph, altitudeBracket.ratio);
+  const fuelTotalLph = lerp(
+    getCruiseTotalFuelLphFromEntry(lowerPerformance, cruiseData),
+    getCruiseTotalFuelLphFromEntry(upperPerformance, cruiseData),
+    altitudeBracket.ratio
+  );
 
   return {
+    engineCount: getCruiseEngineCount(cruiseData),
     fuelPerEngineLph,
-    fuelTotalLph: fuelPerEngineLph * 2,
+    fuelTotalLph,
     groundSpeedKt: ktas + windComponentKt,
     isaDeltaC,
     ktas,
@@ -14836,21 +15899,33 @@ function getP2006TCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, m
   };
 }
 
-function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
-  if (!P2006T_CRUISE) {
+function getP2006TCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruisePerformanceForTable(P2006T_CRUISE, pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
+}
+
+function getR172KCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruisePerformanceForTable(R172K_CRUISE, pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
+}
+
+function getSelectedCruisePerformance(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruisePerformanceForTable(getSelectedCruisePerformanceTable(), pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
+}
+
+function getCruiseTableReadForTable(cruiseData, pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  if (!cruiseData) {
     return null;
   }
 
   const activeMode = mode === "eco-distance" || mode === "manual" ? mode : "eco-time";
-  const pressureAltitudeChoice = getNearestValue(P2006T_CRUISE.pressureAltitudesFt, pressureAltitudeFt);
+  const pressureAltitudeChoice = getNearestValue(cruiseData.pressureAltitudesFt, pressureAltitudeFt);
   if (pressureAltitudeChoice === null) {
     return null;
   }
 
   const isaDeltaC = oatC - getIsaTemperature(pressureAltitudeChoice);
-  const isaDeltaChoice = getNearestValue(P2006T_CRUISE.isaDeltaC, isaDeltaC);
-  const table = P2006T_CRUISE.tables[String(pressureAltitudeChoice)];
-  const temperatureIndex = P2006T_CRUISE.isaDeltaC.indexOf(isaDeltaChoice);
+  const isaDeltaChoice = getNearestValue(cruiseData.isaDeltaC, isaDeltaC);
+  const table = cruiseData.tables[String(pressureAltitudeChoice)];
+  const temperatureIndex = cruiseData.isaDeltaC.indexOf(isaDeltaChoice);
   if (!Array.isArray(table) || temperatureIndex < 0) {
     return null;
   }
@@ -14863,7 +15938,7 @@ function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mod
 
     return {
       fuelPerEngineLph: value.fuelPerEngineLph,
-      fuelTotalLph: value.fuelPerEngineLph * 2,
+      fuelTotalLph: getCruiseTotalFuelLphFromEntry(value, cruiseData),
       groundSpeedKt: value.ktas + windComponentKt,
       ktas: value.ktas,
       mapInHg: setting.mapInHg,
@@ -14872,7 +15947,7 @@ function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mod
     };
   });
 
-  const cruisePerformance = pickCruisePerformance(tableEntries, activeMode, windComponentKt, manualTarget);
+  const cruisePerformance = pickCruisePerformance(tableEntries, activeMode, windComponentKt, manualTarget, cruiseData);
 
   if (!cruisePerformance) {
     return null;
@@ -14880,6 +15955,7 @@ function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mod
 
   return {
     ...cruisePerformance,
+    engineCount: getCruiseEngineCount(cruiseData),
     groundSpeedKt: cruisePerformance.ktas + windComponentKt,
     isaDeltaC: isaDeltaChoice,
     mode: activeMode,
@@ -14887,6 +15963,18 @@ function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mod
     settingLabel: getCruiseSettingLabel(cruisePerformance, activeMode, manualTarget),
     windComponentKt
   };
+}
+
+function getP2006TCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruiseTableReadForTable(P2006T_CRUISE, pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
+}
+
+function getR172KCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruiseTableReadForTable(R172K_CRUISE, pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
+}
+
+function getSelectedCruiseTableRead(pressureAltitudeFt, oatC, windComponentKt, mode = "eco-time", manualTarget = null) {
+  return getCruiseTableReadForTable(getSelectedCruisePerformanceTable(), pressureAltitudeFt, oatC, windComponentKt, mode, manualTarget);
 }
 
 function getConservativeMetricForWeightTable(weightTable, metricKey, pressureAltitudeFt, temperatureC) {
@@ -15699,9 +16787,10 @@ function renderAircraftFuelLitersCell(row, minimumFuelLiters) {
 
   const entry = getFuelPlanningEntry(row.key);
   const defaultSuggestion = entry.fuelLiters === "" ? getFuelPlanningSuggestion(row.key, "fuelLiters") : null;
+  const maxFuelLiters = row.key === "fuelOnBoard" ? getFuelTankCapacityLiters() : 9999;
   return [
     "<td>",
-    '<input type="number" min="0" max="9999" step="1" aria-label="' + escapeHtml(row.label + " fuel liters") + '" data-fuel-row="' + escapeHtml(row.key) + '" data-fuel-field="fuelLiters" value="' + escapeHtml(getFuelPlanningFuelValue(row)) + '" title="' + escapeHtml(defaultSuggestion ? defaultSuggestion.title : "") + '">',
+    '<input type="number" min="0" max="' + escapeHtml(maxFuelLiters) + '" step="1" aria-label="' + escapeHtml(row.label + " fuel liters") + '" data-fuel-row="' + escapeHtml(row.key) + '" data-fuel-field="fuelLiters" value="' + escapeHtml(getFuelPlanningFuelValue(row)) + '" title="' + escapeHtml(defaultSuggestion ? defaultSuggestion.title : "") + '">',
     "</td>"
   ].join("");
 }
@@ -15821,7 +16910,7 @@ function handleFuelPlanningFieldChange(input) {
   const entry = getFuelPlanningEntry(row.key);
   const normalizedValue = fieldKey === "time"
     ? normalizeFuelPlanningTime(input.value)
-    : normalizeFuelPlanningFuelValue(input.value);
+    : normalizeFuelPlanningFuelValueForRow(row, input.value);
   input.value = normalizedValue;
 
   if (fieldKey === "time") {
@@ -18719,7 +19808,7 @@ function renderPlannerEconomyModal() {
   if (refs.plannerEconomySubtitle) {
     refs.plannerEconomySubtitle.textContent = hasError
       ? "Build a route before applying economy altitudes."
-      : "Best-distance profile from P2006T cruise tables.";
+      : "Best-distance profile from selected aircraft cruise tables.";
   }
 
   refs.plannerEconomyContent.innerHTML = hasError
@@ -19627,14 +20716,15 @@ function getAdvisoryContext(runway, wind, densityAltitude, weight, latestMetar, 
   }
 
   if (takeoffPerformance) {
-    if (!P2006T_TABLE_VALIDATION.ok) {
+    const takeoffTableName = selectedAircraftUsesR172KPerformanceTables() ? "R172K" : "P2006T";
+    if (!selectedAircraftUsesR172KPerformanceTables() && !P2006T_TABLE_VALIDATION.ok) {
       notes.push("Internal table validation failed. Recheck the POH data before relying on these numbers.");
       raise("error");
     }
 
     if (takeoffPerformance.weightClamped) {
       notes.push(
-        "Weight is outside the available P2006T takeoff tables (" +
+        "Weight is outside the available " + takeoffTableName + " takeoff tables (" +
         takeoffPerformance.supportedWeightKg[0] +
         "-" +
         takeoffPerformance.supportedWeightKg[1] +
@@ -21503,6 +22593,46 @@ function getTaxiChartPointString(points) {
     .join(" ");
 }
 
+function getTaxiChartVfrCircuitPoint(routeData, point) {
+  const intersectionId = normalizeGroundThingId(point && (point.intersectionId || point.sourceIntersectionId || point.id));
+  const intersection = intersectionId && routeData && routeData.chartOverlay && Array.isArray(routeData.chartOverlay.intersections)
+    ? routeData.chartOverlay.intersections.find((candidate) => normalizeGroundThingId(candidate && candidate.id) === intersectionId)
+    : null;
+  return {
+    id: intersectionId || "",
+    x: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.width, Number(intersection ? intersection.x : point && point.x))),
+    y: Math.max(0, Math.min(TAXI_CHART_VIEWBOX.height, Number(intersection ? intersection.y : point && point.y)))
+  };
+}
+
+function renderTaxiChartVfrCircuits(routeData, lineWidth) {
+  const circuits = routeData && routeData.chartOverlay && routeData.chartOverlay.vfrCircuits && typeof routeData.chartOverlay.vfrCircuits === "object"
+    ? routeData.chartOverlay.vfrCircuits
+    : {};
+  return Object.keys(circuits)
+    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }))
+    .map((circuitId) => {
+      const circuit = circuits[circuitId] || {};
+      const points = (Array.isArray(circuit.points) ? circuit.points : [])
+        .map((point) => getTaxiChartVfrCircuitPoint(routeData, point))
+        .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+      const pointString = getTaxiChartPointString(points);
+      if (!points.length) {
+        return "";
+      }
+      const width = Math.max(3, toNumber(lineWidth, 7) * 0.86);
+      const haloWidth = width * 2.45;
+      const radius = Math.max(4.2, width * 0.75);
+      const pointStrokeWidth = Math.max(1.8, width * 0.3);
+      return [
+        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-halo" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>' : "",
+        points.length > 1 ? '<polyline class="taxi-chart-vfr-circuit-line" points="' + escapeHtml(pointString) + '" stroke-width="' + formatChartNumber(width) + '" data-base-stroke-width="' + formatChartNumber(width) + '"><title>' + escapeHtml((circuit.label || circuit.id || circuitId) + " VFR circuit") + '</title></polyline>' : "",
+        points.map((point, index) => '<circle class="taxi-chart-vfr-circuit-point" cx="' + formatChartNumber(point.x) + '" cy="' + formatChartNumber(point.y) + '" r="' + formatChartNumber(radius) + '" stroke-width="' + formatChartNumber(pointStrokeWidth) + '" data-base-r="' + formatChartNumber(radius) + '" data-base-stroke-width="' + formatChartNumber(pointStrokeWidth) + '"><title>' + escapeHtml((circuit.id || circuitId) + " point " + (index + 1)) + '</title></circle>').join("")
+      ].join("");
+    })
+    .join("");
+}
+
 function getTaxiChartRoutePointMarkup(points, lineWidth, options = {}) {
   const radius = Math.max(5, toNumber(lineWidth, 7) * 0.9);
   const pointStrokeWidth = Math.max(2.2, lineWidth * 0.32);
@@ -22213,6 +23343,7 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
   const routePointString = getTaxiChartPointString(routePoints);
   const routeWidth = Math.max(3, Math.min(toNumber(state.taxiChartRouteWidth, 7), 16));
   const haloWidth = routeWidth * 2.6;
+  const vfrCircuitMarkup = renderTaxiChartVfrCircuits(getTaxiOutRouteData(airport), routeWidth);
   const savedTransform = state.taxiChartTransform && typeof state.taxiChartTransform === "object"
     ? state.taxiChartTransform
     : {};
@@ -22270,6 +23401,7 @@ function renderTaxiChartPanel(activePhase = "taxiout") {
       : '<div class="taxi-chart-empty">' + (isLoadingStoredPdf ? "Restoring stored airport chart..." : "Load airport chart PDF to use it as taxi background.") + "</div>",
     '<svg class="taxi-chart-overlay" data-taxi-chart-overlay viewBox="0 0 ' + TAXI_CHART_VIEWBOX.width + " " + TAXI_CHART_VIEWBOX.height + '" preserveAspectRatio="none" aria-label="Taxi route overlay">',
     '<rect x="0" y="0" width="' + TAXI_CHART_VIEWBOX.width + '" height="' + TAXI_CHART_VIEWBOX.height + '" fill="transparent" pointer-events="all"/>',
+    vfrCircuitMarkup,
     '<polyline class="taxi-chart-route-halo" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(haloWidth) + '" data-base-stroke-width="' + formatChartNumber(haloWidth) + '"></polyline>',
     '<polyline class="taxi-chart-route-line" points="' + escapeHtml(routePointString) + '" stroke-width="' + formatChartNumber(routeWidth) + '" data-base-stroke-width="' + formatChartNumber(routeWidth) + '"></polyline>',
     getTaxiChartRoutePointMarkup(routePoints, routeWidth, { hideFirstPoint: isTaxiIn }),
@@ -24866,75 +25998,104 @@ function calculate(options = {}) {
   const cruiseIsaDeltaC = cruiseOatC - getIsaTemperature(cruiseAltitudeFt);
   const cruiseEngineMode = getCruiseOptimizationMode();
   const cruiseManualTarget = getCruiseManualTarget();
-  const cruisePerformance = getP2006TCruisePerformance(
+  const usesP2006TPerformance = selectedAircraftUsesP2006TPerformanceTables();
+  const usesR172KPerformance = selectedAircraftUsesR172KPerformanceTables();
+  const selectedCruiseData = getSelectedCruisePerformanceTable();
+  const cruisePerformance = getSelectedCruisePerformance(
     cruiseAltitudeFt,
     cruiseOatC,
     cruiseWindComponentKt,
     cruiseEngineMode,
     cruiseManualTarget
   );
-  const cruiseTableRead = getP2006TCruiseTableRead(
+  const cruiseTableRead = getSelectedCruiseTableRead(
     cruiseAltitudeFt,
     cruiseOatC,
     cruiseWindComponentKt,
     cruiseEngineMode,
     cruiseManualTarget
   );
-  const takeoffPerformance = getP2006TTakeoffPerformance(takeoffWeightKg, takeoffContext.pressureAltitude, temperature, takeoffContext.runway, takeoffContext.wind);
-  const conservativeTableRead = getP2006TConservativeTableRead(takeoffWeightKg, takeoffContext.pressureAltitude, temperature, takeoffContext.runway, takeoffContext.wind);
-  const landingPerformance = getP2006TLandingPerformance(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind);
-  const landingConservativeTableRead = getP2006TLandingConservativeTableRead(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind);
-  const climbPerformance = getP2006TClimbPerformance(weight, climbContext.pressureAltitude, temperature);
-  const climbVxPerformance = getP2006TClimbPerformance(
-    weight,
-    climbContext.pressureAltitude,
-    temperature,
-    P2006T_CLIMB_VX,
-    P2006T_CLIMB_VX_WEIGHTS_KG
-  );
-  const climbFlapsUpVyPerformance = getP2006TClimbPerformance(
-    weight,
-    climbContext.pressureAltitude,
-    temperature,
-    P2006T_CLIMB_FLAPS_UP_VY,
-    P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG
-  );
-  const climbFlapsUpVxPerformance = getP2006TClimbPerformance(
-    weight,
-    climbContext.pressureAltitude,
-    temperature,
-    P2006T_CLIMB_FLAPS_UP_VX,
-    P2006T_CLIMB_FLAPS_UP_VX_WEIGHTS_KG
-  );
-  const climbOneEngineInopVyPerformance = getP2006TClimbPerformance(
-    weight,
-    climbContext.pressureAltitude,
-    temperature,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-  );
-  const climbOneEngineInopVxPerformance = getP2006TClimbPerformance(
-    weight,
-    climbContext.pressureAltitude,
-    temperature,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-  );
+  const takeoffPerformance = getSelectedTakeoffPerformance(takeoffWeightKg, takeoffContext.pressureAltitude, temperature, takeoffContext.runway, takeoffContext.wind);
+  const conservativeTableRead = getSelectedTakeoffConservativeTableRead(takeoffWeightKg, takeoffContext.pressureAltitude, temperature, takeoffContext.runway, takeoffContext.wind);
+  const landingPerformance = usesR172KPerformance
+    ? getR172KLandingPerformance(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind)
+    : usesP2006TPerformance
+      ? getP2006TLandingPerformance(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind)
+      : null;
+  const landingConservativeTableRead = usesR172KPerformance
+    ? getR172KLandingConservativeTableRead(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind)
+    : usesP2006TPerformance
+      ? getP2006TLandingConservativeTableRead(landingWeightKg, landingContext.pressureAltitude, temperature, landingContext.runway, landingContext.wind)
+      : null;
+  const climbPerformance = usesR172KPerformance
+    ? getR172KClimbPerformance(weight, climbContext.pressureAltitude, temperature)
+    : usesP2006TPerformance
+    ? getP2006TClimbPerformance(weight, climbContext.pressureAltitude, temperature)
+    : null;
+  const climbVxPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      climbContext.pressureAltitude,
+      temperature,
+      P2006T_CLIMB_VX,
+      P2006T_CLIMB_VX_WEIGHTS_KG
+    )
+    : null;
+  const climbFlapsUpVyPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      climbContext.pressureAltitude,
+      temperature,
+      P2006T_CLIMB_FLAPS_UP_VY,
+      P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG
+    )
+    : null;
+  const climbFlapsUpVxPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      climbContext.pressureAltitude,
+      temperature,
+      P2006T_CLIMB_FLAPS_UP_VX,
+      P2006T_CLIMB_FLAPS_UP_VX_WEIGHTS_KG
+    )
+    : null;
+  const climbOneEngineInopVyPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      climbContext.pressureAltitude,
+      temperature,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
+    )
+    : null;
+  const climbOneEngineInopVxPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      climbContext.pressureAltitude,
+      temperature,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
+    )
+    : null;
   const takeoffEngineOutAltitudeFt = takeoffContext.elevation;
-  const takeoffEngineOutVyPerformance = getP2006TClimbPerformance(
-    weight,
-    takeoffEngineOutAltitudeFt,
-    temperature,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-  );
-  const takeoffEngineOutVxPerformance = getP2006TClimbPerformance(
-    weight,
-    takeoffEngineOutAltitudeFt,
-    temperature,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-  );
+  const takeoffEngineOutVyPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      takeoffEngineOutAltitudeFt,
+      temperature,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
+    )
+    : null;
+  const takeoffEngineOutVxPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      takeoffEngineOutAltitudeFt,
+      temperature,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
+    )
+    : null;
   const emergencyContext = getEmergencyAltitudeContext({
     activePhase: activePerformancePhase,
     cruiseAltitudeFt,
@@ -24944,20 +26105,24 @@ function calculate(options = {}) {
     temperature,
     temperatureSourceLabel
   });
-  const emergencyVyPerformance = getP2006TClimbPerformance(
-    weight,
-    emergencyContext.altitudeFt,
-    emergencyContext.temperatureC,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-  );
-  const emergencyVxPerformance = getP2006TClimbPerformance(
-    weight,
-    emergencyContext.altitudeFt,
-    emergencyContext.temperatureC,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX,
-    P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-  );
+  const emergencyVyPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      emergencyContext.altitudeFt,
+      emergencyContext.temperatureC,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
+    )
+    : null;
+  const emergencyVxPerformance = usesP2006TPerformance
+    ? getP2006TClimbPerformance(
+      weight,
+      emergencyContext.altitudeFt,
+      emergencyContext.temperatureC,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX,
+      P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
+    )
+    : null;
   const takeoffTableRead = takeoffPerformance && takeoffPerformance.conservativeTableRead
     ? takeoffPerformance.conservativeTableRead
     : conservativeTableRead;
@@ -24966,88 +26131,110 @@ function calculate(options = {}) {
     : landingConservativeTableRead;
   const climbTableRead = climbPerformance && climbPerformance.conservativeTableRead
     ? climbPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(weight, climbContext.pressureAltitude, temperature);
+    : usesR172KPerformance
+      ? getR172KClimbConservativeTableRead(weight, climbContext.pressureAltitude, temperature)
+      : usesP2006TPerformance
+        ? getP2006TClimbConservativeTableRead(weight, climbContext.pressureAltitude, temperature)
+        : null;
   const climbVxTableRead = climbVxPerformance && climbVxPerformance.conservativeTableRead
     ? climbVxPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         climbContext.pressureAltitude,
         temperature,
         P2006T_CLIMB_VX,
         P2006T_CLIMB_VX_WEIGHTS_KG
-      );
+      )
+      : null;
   const climbFlapsUpVyTableRead = climbFlapsUpVyPerformance && climbFlapsUpVyPerformance.conservativeTableRead
     ? climbFlapsUpVyPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         climbContext.pressureAltitude,
         temperature,
         P2006T_CLIMB_FLAPS_UP_VY,
         P2006T_CLIMB_FLAPS_UP_VY_WEIGHTS_KG
-      );
+      )
+      : null;
   const climbFlapsUpVxTableRead = climbFlapsUpVxPerformance && climbFlapsUpVxPerformance.conservativeTableRead
     ? climbFlapsUpVxPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         climbContext.pressureAltitude,
         temperature,
         P2006T_CLIMB_FLAPS_UP_VX,
         P2006T_CLIMB_FLAPS_UP_VX_WEIGHTS_KG
-      );
+      )
+      : null;
   const climbOneEngineInopVyTableRead = climbOneEngineInopVyPerformance && climbOneEngineInopVyPerformance.conservativeTableRead
     ? climbOneEngineInopVyPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         climbContext.pressureAltitude,
         temperature,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-      );
+      )
+      : null;
   const climbOneEngineInopVxTableRead = climbOneEngineInopVxPerformance && climbOneEngineInopVxPerformance.conservativeTableRead
     ? climbOneEngineInopVxPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         climbContext.pressureAltitude,
         temperature,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-      );
+      )
+      : null;
   const takeoffEngineOutVyTableRead = takeoffEngineOutVyPerformance && takeoffEngineOutVyPerformance.conservativeTableRead
     ? takeoffEngineOutVyPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         takeoffEngineOutAltitudeFt,
         temperature,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-      );
+      )
+      : null;
   const takeoffEngineOutVxTableRead = takeoffEngineOutVxPerformance && takeoffEngineOutVxPerformance.conservativeTableRead
     ? takeoffEngineOutVxPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         takeoffEngineOutAltitudeFt,
         temperature,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-      );
+      )
+      : null;
   const emergencyVyTableRead = emergencyVyPerformance && emergencyVyPerformance.conservativeTableRead
     ? emergencyVyPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         emergencyContext.altitudeFt,
         emergencyContext.temperatureC,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY,
         P2006T_CLIMB_ONE_ENGINE_INOP_VY_WEIGHTS_KG
-      );
+      )
+      : null;
   const emergencyVxTableRead = emergencyVxPerformance && emergencyVxPerformance.conservativeTableRead
     ? emergencyVxPerformance.conservativeTableRead
-    : getP2006TClimbConservativeTableRead(
+    : usesP2006TPerformance
+      ? getP2006TClimbConservativeTableRead(
         weight,
         emergencyContext.altitudeFt,
         emergencyContext.temperatureC,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX,
         P2006T_CLIMB_ONE_ENGINE_INOP_VX_WEIGHTS_KG
-      );
+      )
+      : null;
   const activeAtmospherePressureAltitude = activePerformancePhase === "cruise"
     ? cruiseAltitudeFt
     : activeContext.pressureAltitude;
@@ -25314,10 +26501,14 @@ function calculate(options = {}) {
   const selectedClimbProfile = state.climbSpeedProfile === "vx" ? "vx" : "vy";
   const selectedClimbEngineMode = state.climbEngineMode === "one-inop" ? "one-inop" : "both";
   const selectedClimbProfileLabel = selectedClimbProfile === "vx" ? "Vx" : "Vy";
-  const selectedClimbDataAvailable = selectedClimbEngineMode === "both"
-    || (selectedClimbEngineMode === "one-inop" && selectedClimbFlaps === "up");
+  const selectedClimbDataAvailable = usesR172KPerformance
+    ? selectedClimbEngineMode === "both"
+    : selectedClimbEngineMode === "both"
+      || (selectedClimbEngineMode === "one-inop" && selectedClimbFlaps === "up");
   const selectedClimbPerformance = !selectedClimbDataAvailable
     ? null
+    : usesR172KPerformance
+      ? climbPerformance
     : selectedClimbEngineMode === "one-inop"
       ? (selectedClimbProfile === "vx" ? climbOneEngineInopVxPerformance : climbOneEngineInopVyPerformance)
       : selectedClimbFlaps === "up"
@@ -25325,6 +26516,8 @@ function calculate(options = {}) {
         : (selectedClimbProfile === "vx" ? climbVxPerformance : climbPerformance);
   const selectedClimbTableRead = !selectedClimbDataAvailable
     ? null
+    : usesR172KPerformance
+      ? climbTableRead
     : selectedClimbEngineMode === "one-inop"
       ? (selectedClimbProfile === "vx" ? climbOneEngineInopVxTableRead : climbOneEngineInopVyTableRead)
       : selectedClimbFlaps === "up"
@@ -25340,7 +26533,13 @@ function calculate(options = {}) {
     metricRow("Pressure altitude", Math.round(climbContext.pressureAltitude) + " ft"),
     metricRow(
       "Configuration",
-      selectedClimbPerformance ? "Gear " + (selectedClimbPerformance.landingGear || "Up") : "n/a"
+      selectedClimbPerformance
+        ? [
+          "Gear " + (selectedClimbPerformance.landingGear || "Up"),
+          selectedClimbPerformance.flaps ? "Flaps " + selectedClimbPerformance.flaps : "",
+          selectedClimbPerformance.powerSetting || ""
+        ].filter(Boolean).join(" / ")
+        : "n/a"
     ),
     metricRow(
       selectedClimbLabel + " interpolated data",
@@ -25368,7 +26567,7 @@ function calculate(options = {}) {
   const cruiseHtml = renderCruiseControls(cruiseAltitudeFt, cruiseOatC, cruiseWindComponentKt, cruisePerformance) + [
     metricRow("Cruise altitude", formatPlannerCruiseAltitudeLabel(cruiseAltitudeContext)),
     metricRow("Altitude source", cruiseAltitudeContext.sourceLabel),
-    metricRow("Weight basis", P2006T_CRUISE ? P2006T_CRUISE.weightKg + " kg table" : "n/a"),
+    metricRow("Weight basis", formatCruiseWeightBasis(selectedCruiseData)),
     metricRow("OAT / ISA delta", (cruiseOatC > 0 ? "+" : "") + cruiseOatC + " C / " + formatIsaDeltaLabel(cruiseIsaDeltaC)),
     metricRow("Wind", formatCruiseWind(cruiseWindComponentKt)),
     metricRow("Engine mode", formatCruiseModeLabel(cruiseEngineMode)),
@@ -25717,6 +26916,8 @@ function attachEvents() {
   refs.aircraftType.addEventListener("change", () => {
     state.selectedAircraftType = refs.aircraftType.value || "P2006T";
     state.aircraftRegistrationDataStatus = "";
+    loadPilotWeightPreference();
+    loadWeightBalancePreferences();
     syncChecklistAircraftFromAircraftSelection();
     saveAircraftPreferences();
     renderAircraftSummary();
@@ -26767,12 +27968,76 @@ function attachEvents() {
   });
 }
 
+const SERVICE_WORKER_REFRESH_KEY = "nordsweet.serviceWorker.refreshing.v1";
+let serviceWorkerHadController = false;
+
+function reloadAfterServiceWorkerUpdate() {
+  try {
+    if (window.sessionStorage.getItem(SERVICE_WORKER_REFRESH_KEY) === "1") {
+      return;
+    }
+    window.sessionStorage.setItem(SERVICE_WORKER_REFRESH_KEY, "1");
+  } catch (_error) {
+    // A blocked sessionStorage should not prevent the app from updating.
+  }
+  window.location.reload();
+}
+
+function requestServiceWorkerActivation(worker) {
+  if (worker && typeof worker.postMessage === "function") {
+    worker.postMessage({ type: "SKIP_WAITING" });
+  }
+}
+
+function watchServiceWorkerRegistration(registration) {
+  if (!registration) {
+    return;
+  }
+
+  if (registration.waiting && navigator.serviceWorker.controller) {
+    requestServiceWorkerActivation(registration.waiting);
+  }
+
+  registration.addEventListener("updatefound", () => {
+    const worker = registration.installing;
+    if (!worker) {
+      return;
+    }
+
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "installed" && navigator.serviceWorker.controller) {
+        requestServiceWorkerActivation(worker);
+      }
+    });
+  });
+}
+
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) {
     return;
   }
 
-  navigator.serviceWorker.register("./sw.js").catch(() => {
+  serviceWorkerHadController = serviceWorkerHadController || Boolean(navigator.serviceWorker.controller);
+  window.setTimeout(() => {
+    try {
+      window.sessionStorage.removeItem(SERVICE_WORKER_REFRESH_KEY);
+    } catch (_error) {
+      // Ignore blocked sessionStorage.
+    }
+  }, 2500);
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!serviceWorkerHadController) {
+      serviceWorkerHadController = true;
+      return;
+    }
+    reloadAfterServiceWorkerUpdate();
+  });
+
+  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then((registration) => {
+    watchServiceWorkerRegistration(registration);
+    return registration.update();
+  }).catch(() => {
     // Ignore failed registration in plain file contexts; the UI should still work.
   });
 }
@@ -26806,7 +28071,7 @@ async function runSelfTestIfRequested() {
   const windSpeed = numberFromInput(refs.windSpd, 0);
   const weight = getWeightBalancePerformanceWeights().takeoffWeightKg;
   const wind = runway ? getWindComponents(runway.hdg, windDirection, windSpeed) : { headwind: 0, crosswind: 0 };
-  const takeoffPerformance = getP2006TTakeoffPerformance(weight, pressureAltitude, temperature, runway, wind);
+  const takeoffPerformance = getSelectedTakeoffPerformance(weight, pressureAltitude, temperature, runway, wind);
   const tableValidation = (P2006T_TABLE_VALIDATION.ok && P2006T_LANDING_TABLE_VALIDATION.ok)
     ? "TABLES OK TO" + P2006T_TABLE_VALIDATION.checkedCells + " LDG" + P2006T_LANDING_TABLE_VALIDATION.checkedCells
     : "TABLES FAIL TO" + P2006T_TABLE_VALIDATION.failures.length + " LDG" + P2006T_LANDING_TABLE_VALIDATION.failures.length;

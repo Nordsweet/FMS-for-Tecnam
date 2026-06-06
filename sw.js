@@ -1,4 +1,4 @@
-const CACHE_NAME = "nordsweet-performance-calculator-v319";
+const CACHE_NAME = "nordsweet-performance-calculator-v329";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,9 @@ const ASSETS = [
   "./aircraft-data/C172%20data.js",
   "./aircraft-data/C152%20data.js",
   "./aircraft-data/HUSK%20data.js",
+  "./aircraft-data/FR172H%20data.js",
+  "./aircraft-data/R172K%20data.js",
+  "./aircraft-data/C172.SP-ANT-data.js",
   "./airports.js",
   "./navdata.js",
   "./procedure-data.js",
@@ -23,6 +26,8 @@ const ASSETS = [
   "./atis-db-config.js",
   "./aircraft-data/p2006t-performance.js",
   "./aircraft-data/husk-performance.js",
+  "./aircraft-data/fr172h-performance.js",
+  "./aircraft-data/r172k-performance.js",
   "./avwx-config.js",
   "./airports.json",
   "./aip_override.json",
@@ -36,6 +41,12 @@ const NETWORK_FIRST_FILENAMES = new Set([
   "index.js",
   "Poland.js"
 ]);
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

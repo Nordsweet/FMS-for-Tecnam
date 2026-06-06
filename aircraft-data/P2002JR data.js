@@ -86,7 +86,7 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
       ]
     }
   ],
-  dataFileBaseName: "SIRA-data",
+  dataFileBaseName: "P2002JR data",
   displayName: "Tecnam P2002JR",
   icaoType: "SIRA",
   order: 3,
