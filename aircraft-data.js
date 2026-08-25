@@ -8,7 +8,8 @@
   }
 
   function normalizeType(value) {
-    return clean(value).toUpperCase();
+    const normalized = clean(value).toUpperCase();
+    return normalized === "C172K" ? "R172K" : normalized;
   }
 
   function normalizeRegistration(value) {
@@ -26,6 +27,11 @@
     return "reciprocating";
   }
 
+  function normalizeEngineCount(value, fallback = null) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 1 && parsed <= 4 ? Math.round(parsed) : fallback;
+  }
+
   function mergePerformanceData(basePerformance, overridePerformance) {
     if (!overridePerformance) {
       return basePerformance || null;
@@ -39,6 +45,32 @@
       basic: {
         ...(basePerformance.basic || {}),
         ...(overridePerformance.basic || {})
+      }
+    };
+  }
+
+  function mergeWeightBalanceData(baseWeightBalance, overrideWeightBalance) {
+    if (!overrideWeightBalance) {
+      return baseWeightBalance || null;
+    }
+    if (!baseWeightBalance || typeof baseWeightBalance !== "object" || typeof overrideWeightBalance !== "object") {
+      return overrideWeightBalance;
+    }
+    return {
+      ...baseWeightBalance,
+      ...overrideWeightBalance,
+      armsM: {
+        ...(baseWeightBalance.armsM || {}),
+        ...(overrideWeightBalance.armsM || {})
+      },
+      defaults: {
+        ...(baseWeightBalance.defaults || {}),
+        ...(overrideWeightBalance.defaults || {})
+      },
+      envelope: overrideWeightBalance.envelope || baseWeightBalance.envelope || null,
+      sourceUnits: {
+        ...(baseWeightBalance.sourceUnits || {}),
+        ...(overrideWeightBalance.sourceUnits || {})
       }
     };
   }
@@ -65,6 +97,9 @@
     const incomingPerformance = profile.performance || null;
     const inheritedPerformance = existing.performance || baseProfile.performance || null;
     const mergedPerformance = mergePerformanceData(inheritedPerformance, incomingPerformance);
+    const incomingWeightBalance = profile.weightBalance || null;
+    const inheritedWeightBalance = existing.weightBalance || baseProfile.weightBalance || null;
+    const mergedWeightBalance = mergeWeightBalanceData(inheritedWeightBalance, incomingWeightBalance);
     const incomingPerformanceStatus = clean(profile.performanceStatus);
     const existingPerformanceStatus = clean(existing.performanceStatus || baseProfile.performanceStatus);
     const performanceStatus = incomingPerformance
@@ -77,6 +112,9 @@
       dataFileBaseName: clean(profile.dataFileBaseName || existing.dataFileBaseName),
       displayName: clean(profile.displayName || existing.displayName || normalizedType),
       displayType: clean(profile.type || existing.displayType || normalizedType),
+      engineCount: normalizeEngineCount(profile.engineCount, normalizeEngineCount(existing.engineCount, normalizeEngineCount(baseProfile.engineCount, null))),
+      fuelCapacityLiters: Number.isFinite(Number(profile.fuelCapacityLiters)) ? Number(profile.fuelCapacityLiters) : existing.fuelCapacityLiters || null,
+      fuelTankCapacityLiters: Number.isFinite(Number(profile.fuelTankCapacityLiters)) ? Number(profile.fuelTankCapacityLiters) : existing.fuelTankCapacityLiters || null,
       icaoType: clean(profile.icaoType || normalizedType).toUpperCase(),
       isRegistrationSpecific: Boolean(normalizedRegistration),
       limitations: profile.limitations || existing.limitations || null,
@@ -88,7 +126,8 @@
       registration: normalizedRegistration,
       source: clean(profile.source || existing.source),
       type: normalizedType,
-      weightBalance: profile.weightBalance || existing.weightBalance || null
+      usableFuelCapacityLiters: Number.isFinite(Number(profile.usableFuelCapacityLiters)) ? Number(profile.usableFuelCapacityLiters) : existing.usableFuelCapacityLiters || null,
+      weightBalance: mergedWeightBalance
     };
     return profiles[key];
   }
@@ -101,6 +140,7 @@
       const exactChecklists = Array.isArray(exact.checklists) ? exact.checklists : [];
       const baseChecklists = Array.isArray(base.checklists) ? base.checklists : [];
       const performance = mergePerformanceData(base.performance || null, exact.performance || null);
+      const weightBalance = mergeWeightBalanceData(base.weightBalance || null, exact.weightBalance || null);
       const exactPerformanceStatus = clean(exact.performanceStatus);
       const basePerformanceStatus = clean(base.performanceStatus);
       return {
@@ -112,7 +152,8 @@
           ? (exact.performance
             ? (exactPerformanceStatus && exactPerformanceStatus !== "pending" ? exactPerformanceStatus : basePerformanceStatus && basePerformanceStatus !== "pending" ? basePerformanceStatus : "available")
             : (exactPerformanceStatus && exactPerformanceStatus !== "pending" ? exactPerformanceStatus : basePerformanceStatus && basePerformanceStatus !== "pending" ? basePerformanceStatus : "available"))
-          : (exactPerformanceStatus || basePerformanceStatus || "pending")
+          : (exactPerformanceStatus || basePerformanceStatus || "pending"),
+        weightBalance
       };
     }
     if (exact) {
@@ -133,6 +174,7 @@
     getProfile,
     getProfileKey,
     loadedFiles,
+    normalizeEngineCount,
     normalizePowerplant,
     normalizeRegistration,
     normalizeType,

@@ -132,6 +132,22 @@
     icaoType: "C172",
     source: "R172K take-off, climb, cruise and landing performance tables.",
     status: "partial",
+    limitations: {
+      wind: {
+        crosswindOperation: "take-off and landing",
+        maxDemonstratedCrosswindKt: 15,
+        maxTailwindKt: 10,
+        maxTailwindTakeoffLandingKt: 10,
+        notes: [
+          "Maximum demonstrated crosswind velocity.",
+          "Take-off and landing performance tables provide tailwind corrections up to 10 kt."
+        ],
+        source: "R172K POH demonstrated crosswind velocity and take-off/landing tailwind correction notes.",
+        tailwindOperation: "take-off and landing",
+        title: "Wind limitations",
+        unit: "kts"
+      }
+    },
     climb: {
       source: "R172K POH rate of climb, maximum, weight 2550 lb.",
       conditions: [
@@ -142,6 +158,9 @@
         "Cowl flap open."
       ],
       flaps: "Up",
+      fuelFlowBasis: "R172K climb fuel flow",
+      fuelFlowGph: round(65 / GAL_TO_L, 3),
+      fuelFlowLph: 65,
       landingGear: "Fixed",
       mixtureGphByPressureAltitudeFt: [
         { pressureAltitudeFt: 0, fuelFlowGph: 16 },
@@ -211,6 +230,26 @@
             [12000, -9, 220, 26, 5.3, 43]
           ], 90)
         }
+      }
+    },
+    glide: {
+      source: "R172K POH glide chart.",
+      title: "Glide distance",
+      conditions: [
+        "Propeller windmilling.",
+        "Flaps up.",
+        "Zero wind."
+      ],
+      bestGlideSpeedByWeight: [
+        { weightLb: 2550, weightKg: round(2550 * LB_TO_KG, 3), speedKias: 75 },
+        { weightLb: 2150, weightKg: round(2150 * LB_TO_KG, 3), speedKias: 69 },
+        { weightLb: 1750, weightKg: round(1750 * LB_TO_KG, 3), speedKias: 62 }
+      ],
+      distanceProfile: {
+        heightAboveTerrainFt: [0, 2000, 4000, 6000, 8000, 10000, 12000],
+        groundDistanceNm: [0, 3.33, 6.67, 10, 13.33, 16.67, 20],
+        ratio: round((20 * 6076.12) / 12000, 2),
+        ratioText: "1:10.1"
       }
     },
     cruise: {

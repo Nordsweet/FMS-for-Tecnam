@@ -3,6 +3,43 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
   dataFileBaseName: "R172K data",
   displayName: "Cessna R172K",
   icaoType: "C172",
+  limitations: window.R172K_PERFORMANCE && window.R172K_PERFORMANCE.limitations
+    ? window.R172K_PERFORMANCE.limitations
+    : {
+      wind: {
+        crosswindOperation: "take-off and landing",
+        maxDemonstratedCrosswindKt: 15,
+        maxTailwindKt: 10,
+        maxTailwindTakeoffLandingKt: 10,
+        notes: [
+          "Maximum demonstrated crosswind velocity.",
+          "Take-off and landing performance tables provide tailwind corrections up to 10 kt."
+        ],
+        source: "R172K POH demonstrated crosswind velocity and take-off/landing tailwind correction notes.",
+        tailwindOperation: "take-off and landing",
+        title: "Wind limitations",
+        unit: "kts"
+      }
+    },
+  metadata: {
+    glide: window.R172K_PERFORMANCE && window.R172K_PERFORMANCE.glide
+      ? window.R172K_PERFORMANCE.glide
+      : {
+        bestGlideSpeedByWeight: [
+          { speedKias: 75, weightLb: 2550 },
+          { speedKias: 69, weightLb: 2150 },
+          { speedKias: 62, weightLb: 1750 }
+        ],
+        distanceProfile: {
+          groundDistanceNm: [0, 3.33, 6.67, 10, 13.33, 16.67, 20],
+          heightAboveTerrainFt: [0, 2000, 4000, 6000, 8000, 10000, 12000],
+          ratio: 10.1,
+          ratioText: "1:10.1"
+        },
+        source: "R172K POH glide chart.",
+        title: "Glide distance"
+      }
+  },
   order: 8,
   performance: window.R172K_PERFORMANCE || null,
   performanceStatus: window.R172K_PERFORMANCE ? "partial" : "pending",
@@ -29,16 +66,16 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
       usableFuelLiters: "72"
     },
     envelope: {
-      maxMomentKgm: 3540.191,
+      maxMomentKgm: 1388.31,
       maxWeightKg: 1156.661,
-      minMomentKgm: 1032.304,
+      minMomentKgm: 645.19,
       minWeightKg: 725.748,
       points: [
-        { momentKgm: 1032.304, weightKg: 725.748 },
-        { momentKgm: 1527.717, weightKg: 884.505 },
-        { momentKgm: 3070.124, weightKg: 1156.661 },
-        { momentKgm: 3540.191, weightKg: 1156.661 },
-        { momentKgm: 1382.55, weightKg: 725.748 }
+        { momentKgm: 645.19, weightKg: 725.748 },
+        { momentKgm: 783.445, weightKg: 884.505 },
+        { momentKgm: 1203.97, weightKg: 1156.661 },
+        { momentKgm: 1388.31, weightKg: 1156.661 },
+        { momentKgm: 864.093, weightKg: 725.748 }
       ]
     },
     fuelArmM: 1.218163,
@@ -63,7 +100,8 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
       oilArmIn: 0,
       oilWeightKg: 8.5,
       rearSeatArmIn: 73,
-      weightBalanceEnvelope: "CG inches / weight lb points: 56/1600, 68/1950, 104.5/2550, 120.5/2550, 75/1600"
+      moment1000LbInToKgm: 11.521246,
+      weightBalanceEnvelope: "Moment/1000 lb-in / weight lb points: 56/1600, 68/1950, 104.5/2550, 120.5/2550, 75/1600"
     }
   }
 });

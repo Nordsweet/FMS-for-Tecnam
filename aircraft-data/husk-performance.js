@@ -389,15 +389,33 @@
       weightsKg: landingFlaps30.weightsKg
     },
     cruise: {
-      source: "A-1A Husky best economy setting provided by user",
-      status: "setting-only",
+      source: "A-1A Husky best economy cruise data provided by user",
+      status: "partial",
+      airspeedBasis: "IAS",
+      engineCount: 1,
+      fuelConsumptionBasis: "Fuel consumption for one engine",
+      isaDeltaC: [0],
+      pressureAltitudesFt: [2000, 5000],
       defaultMode: "bestEconomy",
       settings: {
         bestEconomy: {
           rpm: 2350,
           mapInHg: 20,
+          iasKt: 87,
+          fuelFlowByAltitudeLph: {
+            "2000": 28.3,
+            "5000": 24.1
+          },
           label: "Best economy"
         }
+      },
+      tables: {
+        "2000": [
+          { rpm: 2350, mapInHg: 20, values: [{ kias: 87, ktas: 87, fuelPerEngineLph: 28.3, fuelTotalLph: 28.3 }] }
+        ],
+        "5000": [
+          { rpm: 2350, mapInHg: 20, values: [{ kias: 87, ktas: 87, fuelPerEngineLph: 24.1, fuelTotalLph: 24.1 }] }
+        ]
       }
     }
   };

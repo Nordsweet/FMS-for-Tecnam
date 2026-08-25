@@ -792,11 +792,42 @@ window.NORDSWEET_AIRCRAFT_DATA.register({
   ],
   dataFileBaseName: "P2006T data",
   displayName: "Tecnam P2006T",
+  engineCount: 2,
   icaoType: "P06T",
   order: 1,
   performance: window.P2006T_PERFORMANCE || null,
   performanceStatus: window.P2006T_PERFORMANCE ? "available" : "pending",
   powerplant: "reciprocating",
   source: "P2006T POH tables currently wired in the app",
-  type: "P2006T"
+  type: "P2006T",
+  weightBalance: {
+    armsM: {
+      baggage: 1.66,
+      coPilot: -0.893,
+      firstPassenger: 0.226,
+      fuel: 0.755,
+      pilot: -0.893,
+      secondPassenger: 0.226
+    },
+    defaults: {
+      emptyArmM: "0.41",
+      emptyWeightKg: "881"
+    },
+    envelope: {
+      maxMomentKgm: 575,
+      maxWeightKg: 1315,
+      minMomentKgm: 150,
+      minWeightKg: 790,
+      points: [
+        { momentKgm: 175, weightKg: 790 },
+        { momentKgm: 260, weightKg: 1180 },
+        { momentKgm: 340, weightKg: 1290 },
+        { momentKgm: 525, weightKg: 1290 },
+        { momentKgm: 325, weightKg: 790 }
+      ]
+    },
+    fuelDensityKgPerL: 0.77,
+    mtowKg: 1290,
+    source: "P2006T W&B data moved from built-in app constants to aircraft profile."
+  }
 });

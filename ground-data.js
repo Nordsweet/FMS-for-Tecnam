@@ -1326,7 +1326,7 @@ window.NORDSWEET_GROUND_DATA = {
       "chartOverlay": {
         "chart": {
           "title": "AD 2 EPKK 2_upscaled_400.pdf",
-          "src": "./charts/AD%202%20EPKK%202_upscaled_400.pdf",
+          "src": "./charts/Poland/EPKK/National%20AIP/AD2.pdf",
           "renderScale": 8,
           "maxScale": 10,
           "aspectRatio": 1.7777777778,
@@ -2617,8 +2617,7 @@ window.NORDSWEET_GROUND_DATA = {
             ]
           }
         ],
-        "taxiwayPaths": {},
-        "vfrCircuits": {}
+        "taxiwayPaths": {}
       },
       "airport": {
         "icao": "EPKK",
@@ -4654,7 +4653,7 @@ window.NORDSWEET_GROUND_DATA = {
         ],
         "chart": {
           "title": "AD_2_EPPO_2-1_upscaled_400.pdf",
-          "src": "./charts/AD_2_EPPO_2-1_upscaled_400.pdf",
+          "src": "./charts/Poland/EPPO/National%20AIP/AD2.pdf",
           "renderScale": 8,
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
@@ -4879,8 +4878,7 @@ window.NORDSWEET_GROUND_DATA = {
               "intersectionId": "INT-536-743"
             }
           ]
-        },
-        "vfrCircuits": {}
+        }
       },
       "airport": {
         "icao": "EPPO",
@@ -5474,14 +5472,13 @@ window.NORDSWEET_GROUND_DATA = {
         ],
         "chart": {
           "title": "AD 2 EPZG 2_upscaled_400.pdf",
-          "src": "./charts/AD%202%20EPZG%202_upscaled_400.pdf",
+          "src": "./charts/Poland/EPZG/National%20AIP/AD2.pdf",
           "renderScale": 8,
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
         },
-        "taxiwayPaths": {},
-        "vfrCircuits": {}
+        "taxiwayPaths": {}
       },
       "airport": {
         "icao": "EPZG",
@@ -5763,13 +5760,12 @@ window.NORDSWEET_GROUND_DATA = {
         },
         "chart": {
           "title": "AD 4 EPNT 2_upscaled_400.pdf",
-          "src": "./charts/AD%204%20EPNT%202_upscaled_400.pdf",
+          "src": "./charts/Poland/EPNT/National%20AIP/AD4.pdf",
           "renderScale": 8,
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        },
-        "vfrCircuits": {}
+        }
       }
     },
     "EPPI": {
@@ -6152,8 +6148,7 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        },
-        "vfrCircuits": {}
+        }
       }
     },
     "EPLS": {
@@ -6707,8 +6702,7 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        },
-        "vfrCircuits": {}
+        }
       }
     },
     "EPNL": {
@@ -6883,8 +6877,7 @@ window.NORDSWEET_GROUND_DATA = {
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        },
-        "vfrCircuits": {}
+        }
       }
     },
     "EPBC": {
@@ -7482,13 +7475,12 @@ window.NORDSWEET_GROUND_DATA = {
         },
         "chart": {
           "title": "AD_4_EPBC_2_upscaled_400.pdf",
-          "src": "./charts/AD_4_EPBC_2_upscaled_400.pdf",
+          "src": "./charts/Poland/EPBC/National%20AIP/AD4.pdf",
           "renderScale": 8,
           "maxScale": 10,
           "aspectRatio": 1.7777777777777777,
           "color": true
-        },
-        "vfrCircuits": {}
+        }
       }
     }
   }
